@@ -90,4 +90,15 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+// OPTIONS metodunu ekleyelim
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 } 
