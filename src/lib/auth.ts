@@ -3,8 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare, hash } from 'bcryptjs';
 
-type UserRole = "USER" | "ADMIN";
-
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -14,35 +12,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            return null;
-          }
-
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-
-          if (!user) {
-            return null;
-          }
-
-          const isPasswordValid = await compare(credentials.password, user.password);
-
-          if (!isPasswordValid) {
-            return null;
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name || '',
-            role: user.role,
-          };
-        } catch (error) {
-          console.error('Auth error:', error);
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email ve şifre gereklidir");
         }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user) {
+          throw new Error("Kullanıcı bulunamadı");
+        }
+
+        const isPasswordValid = await compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Geçersiz şifre");
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name || '',
+          role: user.role,
+        };
       },
     }),
   ],
@@ -57,14 +50,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role as UserRole;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+        session.user.role = token.role as string;
       }
       return session;
     },
