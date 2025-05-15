@@ -14,30 +14,35 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email ve şifre gereklidir");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email ve şifre gereklidir");
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user) {
+            throw new Error("Kullanıcı bulunamadı");
+          }
+
+          const isPasswordValid = await compare(credentials.password, user.password);
+
+          if (!isPasswordValid) {
+            throw new Error("Geçersiz şifre");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name || '',
+            role: user.role as UserRole,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          throw error;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) {
-          throw new Error("Kullanıcı bulunamadı");
-        }
-
-        const isPasswordValid = await compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error("Geçersiz şifre");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name || '',
-          role: user.role as UserRole,
-        };
       },
     }),
   ],
@@ -51,22 +56,43 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role as UserRole;
+      try {
+        if (user) {
+          token.id = user.id;
+          token.role = user.role as UserRole;
+        }
+        return token;
+      } catch (error) {
+        console.error('JWT callback error:', error);
+        return token;
       }
-      return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+      try {
+        if (session.user) {
+          session.user.id = token.id as string;
+          session.user.role = token.role as UserRole;
+        }
+        return session;
+      } catch (error) {
+        console.error('Session callback error:', error);
+        return session;
       }
-      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
+  logger: {
+    error(code, metadata) {
+      console.error('NextAuth error:', { code, metadata });
+    },
+    warn(code) {
+      console.warn('NextAuth warning:', code);
+    },
+    debug(code, metadata) {
+      console.debug('NextAuth debug:', { code, metadata });
+    },
+  },
 };
 
 export async function hashPassword(password: string): Promise<string> {
