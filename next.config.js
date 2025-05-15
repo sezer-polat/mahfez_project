@@ -33,20 +33,9 @@ const nextConfig = {
       },
     ];
   },
-  // Increase the maximum header size
   serverRuntimeConfig: {
     maxHeaderSize: 16384, // 16KB
-  },
-  experimental: {
-    serverActions: true,
-  },
-  env: {
-    NODE_ENV: process.env.NODE_ENV,
-  },
-  // Geliştirme modunda hata mesajlarını göster
-  onError: (err) => {
-    console.error('Next.js error:', err);
-  },
+  }
 }
 
 module.exports = nextConfig 
