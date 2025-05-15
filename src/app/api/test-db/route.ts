@@ -8,17 +8,13 @@ export async function GET() {
     // Veritabanı bağlantısını test et
     await prisma.$connect();
     
-    // Tüm tabloları listele
-    const tables = await prisma.$queryRaw`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public'
-    `;
+    // Basit bir sorgu yap
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
     
     return NextResponse.json({
       success: true,
       message: 'Veritabanı bağlantısı başarılı',
-      tables
+      result
     });
   } catch (error) {
     console.error('Veritabanı bağlantı hatası:', error);
