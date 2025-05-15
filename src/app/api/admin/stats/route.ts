@@ -78,9 +78,16 @@ export async function GET() {
       recentBookings
     });
   } catch (error) {
-    console.error('İstatistik hatası:', error);
+    console.error('İstatistik hatası detayı:', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
     return NextResponse.json(
-      { message: 'İstatistikler alınamadı' },
+      { 
+        message: 'İstatistikler alınamadı',
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      },
       { status: 500 }
     );
   }
