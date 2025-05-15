@@ -19,27 +19,4 @@ export async function OPTIONS() {
   });
 }
 
-// GET ve POST handler'ları
-export const GET = async (req: Request) => {
-  const response = await handler(req);
-  const headers = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    headers.set(key, value);
-  });
-  return new Response(response.body, {
-    status: response.status,
-    headers
-  });
-};
-
-export const POST = async (req: Request) => {
-  const response = await handler(req);
-  const headers = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    headers.set(key, value);
-  });
-  return new Response(response.body, {
-    status: response.status,
-    headers
-  });
-}; 
+export { handler as GET, handler as POST }; 

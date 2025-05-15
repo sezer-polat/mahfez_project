@@ -8,37 +8,41 @@ type UserRole = "USER" | "ADMIN";
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      id: "credentials",
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email ve şifre gereklidir");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user) {
+            return null;
+          }
+
+          const isPasswordValid = await compare(credentials.password, user.password);
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name || '',
+            role: user.role,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) {
-          throw new Error("Kullanıcı bulunamadı");
-        }
-
-        const isPasswordValid = await compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error("Geçersiz şifre");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name || '',
-          role: user.role,
-        };
       },
     }),
   ],
@@ -48,7 +52,6 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -67,8 +70,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
-  trustHost: true,
 };
 
 export async function hashPassword(password: string): Promise<string> {
