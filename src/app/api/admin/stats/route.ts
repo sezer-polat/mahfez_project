@@ -7,16 +7,30 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    console.log('Stats API: Session kontrolü başlıyor...');
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'ADMIN') {
+    
+    if (!session) {
+      console.log('Stats API: Oturum bulunamadı');
+      return NextResponse.json(
+        { message: 'Oturum bulunamadı' },
+        { status: 401 }
+      );
+    }
+
+    if (session.user.role !== 'ADMIN') {
+      console.log('Stats API: Yetkisiz erişim denemesi', { role: session.user.role });
       return NextResponse.json(
         { message: 'Yetkisiz erişim' },
         { status: 401 }
       );
     }
 
+    console.log('Stats API: Veritabanı sorguları başlıyor...');
+
     // Toplam rezervasyon sayısı
     const totalReservations = await prisma.reservation.count();
+    console.log('Stats API: Toplam rezervasyon sayısı:', totalReservations);
 
     // Durumlara göre rezervasyon sayıları
     const pendingReservations = await prisma.reservation.count({
@@ -68,6 +82,8 @@ export async function GET() {
       },
     });
 
+    console.log('Stats API: Tüm veriler başarıyla alındı');
+
     return NextResponse.json({
       totalReservations,
       pendingReservations,
@@ -78,15 +94,18 @@ export async function GET() {
       recentBookings
     });
   } catch (error) {
-    console.error('İstatistik hatası detayı:', {
+    console.error('Stats API: Detaylı hata bilgisi:', {
       error: error instanceof Error ? error.message : 'Bilinmeyen hata',
       stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
+      name: error instanceof Error ? error.name : undefined,
+      type: error instanceof Error ? error.constructor.name : typeof error
     });
+    
     return NextResponse.json(
       { 
         message: 'İstatistikler alınamadı',
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+        type: error instanceof Error ? error.constructor.name : typeof error
       },
       { status: 500 }
     );

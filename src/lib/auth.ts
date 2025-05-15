@@ -4,15 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { compare, hash } from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/giris",
-  },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      id: "credentials",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
@@ -47,6 +42,12 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/giris",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -69,6 +70,7 @@ export const authOptions: NextAuthOptions = {
       };
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export async function hashPassword(password: string): Promise<string> {
