@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare, hash } from 'bcryptjs';
 
+type UserRole = "USER" | "ADMIN";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -52,14 +54,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        token.role = user.role as UserRole;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as UserRole;
       }
       return session;
     },
