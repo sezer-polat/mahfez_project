@@ -1,11 +1,11 @@
-import { createClient } from '@/utils/supabase/server';
+import { createSupabaseClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Notes() {
   try {
     console.log('Creating Supabase client...');
-    const supabase = await createClient();
+    const supabase = await createSupabaseClient();
     console.log('Supabase client created successfully');
 
     console.log('Fetching notes...');
