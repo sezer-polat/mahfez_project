@@ -12,7 +12,11 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error(error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      digest: error.digest
+    })
   }, [error])
 
   return (
@@ -30,15 +34,33 @@ export default function Error({
           </p>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                Ne yapmak istersiniz?
+              <span className="px-2 bg-white text-gray-500">
+                Hata Detayları
               </span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="bg-red-50 p-4 rounded-md">
+              <p className="text-sm text-red-700">
+                Hata Mesajı: {error.message}
+              </p>
+              {error.digest && (
+                <p className="text-sm text-red-700 mt-2">
+                  Hata Kodu: {error.digest}
+                </p>
+              )}
+              {error.stack && (
+                <pre className="text-xs text-red-700 mt-2 overflow-auto">
+                  {error.stack}
+                </pre>
+              )}
             </div>
           </div>
 
@@ -65,18 +87,6 @@ export default function Error({
               Yardım Al
             </Link>
           </div>
-        </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-600">
-            Hata detayı: {error.message}
-          </p>
-          <p className="mt-2 text-sm text-gray-600">
-            Sorun devam ederse{' '}
-            <Link href="/iletisim" className="font-medium text-primary hover:text-opacity-90">
-              bizimle iletişime geçin
-            </Link>
-          </p>
         </div>
       </div>
     </div>
