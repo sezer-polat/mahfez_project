@@ -4,23 +4,51 @@ import { corsHeaders } from "@/lib/cors";
 
 const handler = NextAuth(authOptions);
 
-export async function GET(request: Request) {
+async function handleRequest(request: Request, handler: any) {
   try {
     const response = await handler(request);
+    
     if (response instanceof Response) {
       const headers = new Headers(response.headers);
       Object.entries(corsHeaders).forEach(([key, value]) => {
         headers.set(key, value);
       });
-      return new Response(response.body, {
+      
+      // Ensure content type is application/json
+      headers.set('Content-Type', 'application/json');
+      
+      // Clone the response to read its body
+      const clonedResponse = response.clone();
+      let body;
+      
+      try {
+        body = await clonedResponse.text();
+        // Try to parse as JSON to validate
+        JSON.parse(body);
+      } catch (e) {
+        // If not valid JSON, return error response
+        return new Response(
+          JSON.stringify({ error: 'Invalid response format' }),
+          {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders,
+            },
+          }
+        );
+      }
+      
+      return new Response(body, {
         status: response.status,
         statusText: response.statusText,
         headers,
       });
     }
+    
     return response;
   } catch (error) {
-    console.error('NextAuth GET error:', error);
+    console.error('NextAuth request error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal Server Error' }),
       {
@@ -34,34 +62,12 @@ export async function GET(request: Request) {
   }
 }
 
+export async function GET(request: Request) {
+  return handleRequest(request, handler);
+}
+
 export async function POST(request: Request) {
-  try {
-    const response = await handler(request);
-    if (response instanceof Response) {
-      const headers = new Headers(response.headers);
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        headers.set(key, value);
-      });
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers,
-      });
-    }
-    return response;
-  } catch (error) {
-    console.error('NextAuth POST error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal Server Error' }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
-      }
-    );
-  }
+  return handleRequest(request, handler);
 }
 
 export async function OPTIONS(request: Request) {
