@@ -23,14 +23,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let session = null;
-  
-  try {
-    session = await getServerSession(authOptions);
-  } catch (error) {
-    console.error('Session error:', error);
-  }
-
   return (
     <html lang="tr">
       <head>
@@ -194,7 +186,7 @@ export default async function RootLayout({
         `}} />
       </head>
       <body className={inter.className}>
-        <SessionProvider session={session}>
+        <SessionProvider>
           <AuthProvider>
             <div className="min-h-screen flex flex-col">
               <Navbar />
