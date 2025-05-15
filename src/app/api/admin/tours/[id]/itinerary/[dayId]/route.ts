@@ -15,7 +15,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, description, activities, meals, accommodation, order } = body;
+    const { title, description, activities, meals, accommodation } = body;
 
     const itinerary = await prisma.itinerary.update({
       where: {
@@ -27,8 +27,7 @@ export async function PUT(
         description,
         activities,
         meals,
-        accommodation,
-        order: typeof order === 'number' ? order : 0
+        accommodation
       },
     });
 
