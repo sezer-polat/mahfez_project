@@ -24,7 +24,7 @@ export default function AdminLogin() {
       });
 
       if (result?.error) {
-        setError('Geçersiz email veya şifre');
+        setError(result.error);
         return;
       }
 

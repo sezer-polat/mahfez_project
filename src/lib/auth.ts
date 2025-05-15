@@ -1,51 +1,49 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "@/lib/db";
-import { compare, hash } from 'bcryptjs';
-import type { User } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import { compare } from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db) as any,
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
-    signIn: "/admin/giris",
+    signIn: "/giris",
   },
   providers: [
     CredentialsProvider({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error("Email ve şifre gereklidir");
         }
 
-        const user = await db.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
         });
 
         if (!user) {
-          return null;
+          throw new Error("Kullanıcı bulunamadı");
         }
 
         const isPasswordValid = await compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          return null;
+          throw new Error("Geçersiz şifre");
         }
 
         return {
           id: user.id,
           email: user.email,
-          name: user.name ?? "",
+          name: user.name,
           role: user.role,
         };
       },
