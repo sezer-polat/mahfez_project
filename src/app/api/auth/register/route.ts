@@ -4,7 +4,19 @@ import { hashPassword, validatePassword } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 export async function POST(req: Request) {
+  console.log('Register request received:', {
+    method: req.method,
+    path: req.url,
+    timestamp: new Date().toISOString()
+  });
+
   try {
     const body = await req.json();
     console.log('Register request body:', body);
@@ -14,7 +26,7 @@ export async function POST(req: Request) {
     if (!email || !password || !name) {
       return NextResponse.json(
         { error: 'Email, şifre ve isim gereklidir' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -27,14 +39,17 @@ export async function POST(req: Request) {
       if (existingUser) {
         return NextResponse.json(
           { error: 'Bu e-posta adresi zaten kullanılıyor' },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
     } catch (dbError) {
       console.error('Database error:', dbError);
       return NextResponse.json(
-        { error: 'Veritabanı bağlantı hatası' },
-        { status: 500 }
+        { 
+          error: 'Veritabanı bağlantı hatası',
+          details: dbError instanceof Error ? dbError.message : 'Bilinmeyen veritabanı hatası'
+        },
+        { status: 500, headers: corsHeaders }
       );
     }
 
@@ -43,7 +58,7 @@ export async function POST(req: Request) {
     if (!passwordValidation.isValid) {
       return NextResponse.json(
         { error: passwordValidation.message },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -54,8 +69,11 @@ export async function POST(req: Request) {
     } catch (hashError) {
       console.error('Password hash error:', hashError);
       return NextResponse.json(
-        { error: 'Şifre işleme hatası' },
-        { status: 500 }
+        { 
+          error: 'Şifre işleme hatası',
+          details: hashError instanceof Error ? hashError.message : 'Bilinmeyen hash hatası'
+        },
+        { status: 500, headers: corsHeaders }
       );
     }
 
@@ -74,31 +92,33 @@ export async function POST(req: Request) {
 
       return NextResponse.json(
         { message: 'Kullanıcı başarıyla oluşturuldu' },
-        { status: 201 }
+        { status: 201, headers: corsHeaders }
       );
     } catch (createError) {
       console.error('User creation error:', createError);
       return NextResponse.json(
-        { error: 'Kullanıcı oluşturma hatası' },
-        { status: 500 }
+        { 
+          error: 'Kullanıcı oluşturma hatası',
+          details: createError instanceof Error ? createError.message : 'Bilinmeyen oluşturma hatası'
+        },
+        { status: 500, headers: corsHeaders }
       );
     }
   } catch (error) {
     console.error('General error:', error);
     return NextResponse.json(
-      { error: 'Bir hata oluştu: ' + (error as Error).message },
-      { status: 500 }
+      { 
+        error: 'Bir hata oluştu',
+        details: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
-// OPTIONS metodunu ekleyelim
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: corsHeaders
   });
 } 
