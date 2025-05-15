@@ -39,7 +39,14 @@ export default function Register() {
         }),
       })
 
-      const data = await response.json()
+      let data;
+      const text = await response.text();
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        data = {};
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Bir hata oluştu')
