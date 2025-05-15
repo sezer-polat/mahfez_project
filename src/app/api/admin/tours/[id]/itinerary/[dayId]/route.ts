@@ -28,7 +28,7 @@ export async function PUT(
         activities,
         meals,
         accommodation,
-        order: order ?? 0
+        order: typeof order === 'number' ? order : 0
       },
     });
 
