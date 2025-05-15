@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
+export const dynamic = 'force-dynamic';
+
 // GET: Tüm kullanıcıları getir (admin için)
 export async function GET() {
   const users = await prisma.user.findMany({

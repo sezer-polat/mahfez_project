@@ -5,6 +5,8 @@ import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+export const dynamic = 'force-dynamic';
+
 // Tekil kategori getir
 export async function GET(
   req: NextRequest,
