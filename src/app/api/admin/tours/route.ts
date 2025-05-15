@@ -69,10 +69,10 @@ export async function POST(request: Request) {
     
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
-    const price = parseFloat(formData.get('price') as string);
-    const duration = parseInt(formData.get('duration') as string);
+    const price = formData.get('price') as string;
+    const duration = formData.get('duration') as string;
     const categoryId = formData.get('categoryId') as string;
-    const capacity = parseInt(formData.get('capacity') as string) || 20;
+    const capacity = formData.get('capacity') as string;
     const image = formData.get('image') as File;
     const startDate = formData.get('startDate') as string;
     const endDate = formData.get('endDate') as string;
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       endDate
     });
 
-    if (!title || !description || isNaN(price) || isNaN(duration) || !categoryId || !startDate || !endDate) {
+    if (!title || !description || !price || !duration || !categoryId || !startDate || !endDate) {
       return NextResponse.json(
         { message: 'Tüm alanları doldurun' },
         { status: 400 }
@@ -129,14 +129,15 @@ export async function POST(request: Request) {
         data: {
           title,
           description,
-          price,
-          duration,
+          price: parseFloat(price),
+          duration: parseInt(duration),
           categoryId,
-          capacity,
-          available: capacity,
-          image: imageUrl,
+          capacity: parseInt(capacity || '20'),
+          available: parseInt(capacity || '20'),
+          image: imageUrl || '',
           startDate: new Date(startDate),
-          endDate: new Date(endDate)
+          endDate: new Date(endDate),
+          isActive: true
         },
       });
 

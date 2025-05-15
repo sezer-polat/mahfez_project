@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { BookingStatus } from '@prisma/client';
+import { Status } from '@prisma/client';
 
 export async function DELETE(
   request: Request,
@@ -10,51 +10,51 @@ export async function DELETE(
 ) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email
-      }
-    });
-
-    if (!user) {
-      return new NextResponse('User not found', { status: 404 });
+    if (!session) {
+      return NextResponse.json({ error: 'Oturum açmanız gerekiyor' }, { status: 401 });
     }
 
     const booking = await prisma.booking.findUnique({
-      where: {
-        id: params.id
-      }
+      where: { id: params.id },
+      include: { tour: true }
     });
 
     if (!booking) {
-      return new NextResponse('Booking not found', { status: 404 });
+      return NextResponse.json({ error: 'Rezervasyon bulunamadı' }, { status: 404 });
     }
 
-    if (booking.userId !== user.id) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    // Sadece kendi rezervasyonunu iptal edebilir
+    if (booking.userId !== session.user.id && session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
     }
 
-    if (booking.status !== BookingStatus.ACTIVE) {
-      return new NextResponse('Only active bookings can be cancelled', { status: 400 });
-    }
+    // Transaction ile rezervasyon iptali ve kapasite güncelleme
+    await prisma.$transaction(async (tx) => {
+      // Rezervasyonu güncelle
+      await tx.booking.update({
+        where: { id: params.id },
+        data: {
+          status: Status.CANCELLED
+        }
+      });
 
-    await prisma.booking.update({
-      where: {
-        id: params.id
-      },
-      data: {
-        status: BookingStatus.CANCELLED
-      }
+      // Tur kapasitesini güncelle
+      await tx.tour.update({
+        where: { id: booking.tourId },
+        data: {
+          available: {
+            increment: booking.numberOfPeople
+          }
+        }
+      });
     });
 
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ message: 'Rezervasyon başarıyla iptal edildi' });
   } catch (error) {
-    console.error('Booking cancellation error:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error('Rezervasyon iptal hatası:', error);
+    return NextResponse.json(
+      { error: 'Rezervasyon iptal edilirken bir hata oluştu' },
+      { status: 500 }
+    );
   }
 } 

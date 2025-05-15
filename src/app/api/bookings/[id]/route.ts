@@ -106,7 +106,7 @@ export async function DELETE(
         where: { id: booking.tourId },
         data: {
           available: {
-            increment: booking.participants
+            increment: 1 // Her rezervasyon için 1 kişilik kapasite artır
           }
         }
       });

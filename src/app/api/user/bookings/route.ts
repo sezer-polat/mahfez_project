@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { BookingStatus } from '@prisma/client';
+import { Status } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -24,7 +24,8 @@ export async function GET() {
 
     const bookings = await prisma.booking.findMany({
       where: {
-        userId: user.id
+        userId: user.id,
+        status: Status.CONFIRMED
       },
       include: {
         tour: {
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
         userId: user.id,
         tourId: tourId,
         status: {
-          in: [BookingStatus.ACTIVE, BookingStatus.COMPLETED]
+          in: [Status.CONFIRMED]
         }
       }
     });
@@ -112,9 +113,9 @@ export async function POST(request: Request) {
       data: {
         userId: user.id,
         tourId: tourId,
-        status: BookingStatus.ACTIVE,
-        totalPrice: tour.price,
-        participants: 1
+        status: Status.CONFIRMED,
+        numberOfPeople: 1,
+        totalPrice: tour.price
       },
       include: {
         tour: {

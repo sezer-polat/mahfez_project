@@ -101,6 +101,9 @@ model Booking {
   status    Status   @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  numberOfPeople Int
+  totalPrice Float
+  notes String?
 }
 
 model Settings {

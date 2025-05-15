@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { tourId, participants, notes } = body;
+    const { tourId, numberOfPeople, notes } = body;
 
     // Tur bilgilerini al
     const tour = await prisma.tour.findUnique({
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     // Kapasite kontrolü
-    if (tour.available < participants) {
+    if (tour.available < numberOfPeople) {
       return new NextResponse('Yetersiz kapasite', { status: 400 });
     }
 
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
         where: { id: tourId },
         data: {
           available: {
-            decrement: participants
+            decrement: numberOfPeople
           }
         }
       });
@@ -92,10 +92,10 @@ export async function POST(req: Request) {
         data: {
           userId: session.user.id,
           tourId,
-          participants,
-          totalPrice: tour.price * participants,
+          numberOfPeople,
+          totalPrice: tour.price * numberOfPeople,
           notes,
-          status: 'ACTIVE'
+          status: 'PENDING'
         }
       });
 

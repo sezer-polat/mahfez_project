@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function PUT(
   request: Request,
@@ -27,7 +28,7 @@ export async function PUT(
         activities,
         meals,
         accommodation,
-        order,
+        ...(order !== undefined && { order }),
       },
     });
 
