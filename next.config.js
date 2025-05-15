@@ -35,6 +35,13 @@ const nextConfig = {
   },
   serverRuntimeConfig: {
     maxHeaderSize: 16384, // 16KB
+  },
+  // Geliştirme modunda hata mesajlarını göster
+  webpack: (config, { dev, isServer }) => {
+    if (dev && isServer) {
+      config.optimization.minimize = false;
+    }
+    return config;
   }
 }
 
