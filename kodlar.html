@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yeşil Yolculuk - Turlar</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#4CAF50", secondary: "#2E7D32" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      body {
+      font-family: 'Poppins', sans-serif;
+      color: #333;
+      }
+      input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 5px;
+      outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+      }
+      input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      }
+      input[type="checkbox"] {
+      display: none;
+      }
+      .custom-checkbox {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      }
+      input[type="checkbox"]:checked + .custom-checkbox {
+      background-color: #4CAF50;
+      border-color: #4CAF50;
+      }
+      input[type="checkbox"]:checked + .custom-checkbox:after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      }
+      .date-picker {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 12px;
+      width: 100%;
+      outline: none;
+      }
+      .date-picker:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+      }
+      .tour-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .tour-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .custom-select {
+      position: relative;
+      display: inline-block;
+      }
+      .custom-select select {
+      display: none;
+      }
+      .select-selected {
+      background-color: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      }
+      .select-items {
+      position: absolute;
+      background-color: white;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      border: 1px solid #e5e7eb;
+      border-radius: 0 0 8px 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      }
+      .select-hide {
+      display: none;
+      }
+      .select-items div, .select-selected {
+      padding: 8px 16px;
+      cursor: pointer;
+      }
+      .select-items div:hover {
+      background-color: rgba(76, 175, 80, 0.1);
+      }
+      .same-as-selected {
+      background-color: rgba(76, 175, 80, 0.1);
+      }
+      .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      }
+      .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      }
+      .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+      }
+      .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      }
+      input:checked + .slider {
+      background-color: #4CAF50;
+      }
+      input:checked + .slider:before {
+      transform: translateX(20px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+      <div
+        class="container mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="#" class="flex items-center">
+            <img src="https://readdy.ai/api/search-image?query=green%20leaf%20logo%20for%20travel%20company&width=40&height=40&seq=1" alt="Yeşil Yolculuk Logo" class="w-10 h-10 mr-2">
+            <span class="text-lg font-semibold text-gray-800">Yeşil Yolculuk</span>
+          </a>
+        </div>
+        <nav class="hidden md:flex items-center space-x-6">
+          <a href="index.html" class="text-gray-600 hover:text-primary transition-colors">Ana Sayfa</a>
+          <a href="turlar.html" class="text-primary font-medium border-b-2 border-primary pb-1">Turlar</a>
+          <a href="hakkimizda.html" class="text-gray-600 hover:text-primary transition-colors">Hakkımızda</a>
+          <a href="iletisim.html" class="text-gray-600 hover:text-primary transition-colors">İletişim</a>
+        </nav>
+        <div class="flex items-center space-x-3">
+          <button
+            class="text-gray-700 hover:text-primary transition-colors px-4 py-2 !rounded-button whitespace-nowrap"
+          >
+            Giriş Yap
+          </button>
+          <button
+            class="bg-primary text-white px-4 py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+          >
+            Kayıt Ol
+          </button>
+          <button class="md:hidden flex items-center justify-center w-10 h-10">
+            <i class="ri-menu-line ri-lg"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="container mx-auto px-4 pt-24 pb-12">
+      <!-- Category Chips -->
+      <div class="mb-8 overflow-x-auto pb-2 hide-scrollbar">
+        <div class="flex space-x-3 min-w-max">
+          <button
+            class="bg-primary text-white px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-opacity-90 transition-colors"
+          >
+            Yurt içi Turlar
+          </button>
+          <button
+            class="bg-white text-gray-700 px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            Yurt dışı Turlar
+          </button>
+          <button
+            class="bg-white text-gray-700 px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            Günübirlik Turlar
+          </button>
+          <button
+            class="bg-white text-gray-700 px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            Kültür Turları
+          </button>
+          <button
+            class="bg-white text-gray-700 px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            Doğa Turları
+          </button>
+          <button
+            class="bg-white text-gray-700 px-4 py-2 !rounded-full whitespace-nowrap shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            Macera Turları
+          </button>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Sidebar Filters -->
+        <div class="w-full md:w-64 lg:w-72 shrink-0">
+          <div class="bg-white rounded-lg shadow-sm p-5 sticky top-24">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-lg">Filtreler</h3>
+              <button class="text-primary text-sm hover:underline">
+                Temizle
+              </button>
+            </div>
+            <!-- Price Range -->
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-3">Fiyat Aralığı</h4>
+              <div class="mb-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="10000"
+                  value="5000"
+                  class="w-full"
+                  id="priceRange"
+                />
+              </div>
+              <div class="flex justify-between text-sm text-gray-600">
+                <span>₺0</span>
+                <span id="priceValue">₺5000</span>
+                <span>₺10000</span>
+              </div>
+            </div>
+            <!-- Date Picker -->
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-3">Tarih Seçin</h4>
+              <input type="date" class="date-picker" />
+            </div>
+            <!-- Location -->
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-3">Konum</h4>
+              <div class="custom-select w-full">
+                <div class="relative">
+                  <select id="locationSelect" class="hidden">
+                    <option value="">Tüm Konumlar</option>
+                    <option value="istanbul">İstanbul</option>
+                    <option value="antalya">Antalya</option>
+                    <option value="izmir">İzmir</option>
+                    <option value="kapadokya">Kapadokya</option>
+                    <option value="bodrum">Bodrum</option>
+                  </select>
+                  <div
+                    class="select-selected flex items-center justify-between p-2.5"
+                  >
+                    <span>Tüm Konumlar</span>
+                    <i class="ri-arrow-down-s-line ri-lg"></i>
+                  </div>
+                  <div class="select-items select-hide">
+                    <div>Tüm Konumlar</div>
+                    <div>İstanbul</div>
+                    <div>Antalya</div>
+                    <div>İzmir</div>
+                    <div>Kapadokya</div>
+                    <div>Bodrum</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Type -->
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-3">Tur Tipi</h4>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input type="checkbox" id="type1" checked />
+                  <label for="type1" class="custom-checkbox"></label>
+                  <label for="type1" class="ml-2 text-gray-700 cursor-pointer"
+                    >Kültür Turu</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="type2" />
+                  <label for="type2" class="custom-checkbox"></label>
+                  <label for="type2" class="ml-2 text-gray-700 cursor-pointer"
+                    >Doğa Turu</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="type3" />
+                  <label for="type3" class="custom-checkbox"></label>
+                  <label for="type3" class="ml-2 text-gray-700 cursor-pointer"
+                    >Gastronomi Turu</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="type4" />
+                  <label for="type4" class="custom-checkbox"></label>
+                  <label for="type4" class="ml-2 text-gray-700 cursor-pointer"
+                    >Macera Turu</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="type5" />
+                  <label for="type5" class="custom-checkbox"></label>
+                  <label for="type5" class="ml-2 text-gray-700 cursor-pointer"
+                    >Plaj Turu</label
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Duration -->
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-3">Süre</h4>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input type="checkbox" id="duration1" />
+                  <label for="duration1" class="custom-checkbox"></label>
+                  <label
+                    for="duration1"
+                    class="ml-2 text-gray-700 cursor-pointer"
+                    >Günübirlik</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="duration2" checked />
+                  <label for="duration2" class="custom-checkbox"></label>
+                  <label
+                    for="duration2"
+                    class="ml-2 text-gray-700 cursor-pointer"
+                    >2-3 Gün</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="duration3" />
+                  <label for="duration3" class="custom-checkbox"></label>
+                  <label
+                    for="duration3"
+                    class="ml-2 text-gray-700 cursor-pointer"
+                    >4-7 Gün</label
+                  >
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="duration4" />
+                  <label for="duration4" class="custom-checkbox"></label>
+                  <label
+                    for="duration4"
+                    class="ml-2 text-gray-700 cursor-pointer"
+                    >7+ Gün</label
+                  >
+                </div>
+              </div>
+            </div>
+            <button
+              class="w-full bg-primary text-white py-2.5 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+            >
+              Filtreleri Uygula
+            </button>
+          </div>
+        </div>
+        <!-- Main Content -->
+        <div class="flex-1">
+          <!-- Sorting and View Controls -->
+          <div
+            class="bg-white rounded-lg shadow-sm p-4 mb-6 flex flex-wrap items-center justify-between gap-4"
+          >
+            <div class="flex items-center space-x-4">
+              <div class="custom-select">
+                <div class="relative">
+                  <select id="sortSelect" class="hidden">
+                    <option value="popular">Popülerlik</option>
+                    <option value="price-asc">Fiyat (Artan)</option>
+                    <option value="price-desc">Fiyat (Azalan)</option>
+                    <option value="date">Tarih</option>
+                  </select>
+                  <div
+                    class="select-selected flex items-center justify-between p-2 min-w-[160px]"
+                  >
+                    <span>Popülerlik</span>
+                    <i class="ri-arrow-down-s-line ri-lg"></i>
+                  </div>
+                  <div class="select-items select-hide">
+                    <div>Popülerlik</div>
+                    <div>Fiyat (Artan)</div>
+                    <div>Fiyat (Azalan)</div>
+                    <div>Tarih</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">Görünüm:</span>
+                <div class="flex">
+                  <button class="bg-primary text-white p-1.5 !rounded-l-button">
+                    <i class="ri-layout-grid-line ri-lg"></i>
+                  </button>
+                  <button
+                    class="bg-gray-100 text-gray-600 p-1.5 !rounded-r-button"
+                  >
+                    <i class="ri-list-check-line ri-lg"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-600">Sayfa başına:</span>
+              <div class="custom-select">
+                <div class="relative">
+                  <select id="perPageSelect" class="hidden">
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="36">36</option>
+                  </select>
+                  <div
+                    class="select-selected flex items-center justify-between p-2 min-w-[80px]"
+                  >
+                    <span>12</span>
+                    <i class="ri-arrow-down-s-line ri-lg"></i>
+                  </div>
+                  <div class="select-items select-hide">
+                    <div>12</div>
+                    <div>24</div>
+                    <div>36</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Tour Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Tour Card 1 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20landscape%20of%20Cappadocia%2C%20Turkey%20with%20hot%20air%20balloons%20flying%20over%20unique%20rock%20formations%20during%20sunrise%2C%20vibrant%20colors%20in%20the%20sky%2C%20natural%20beauty%20of%20Turkish%20landscape&width=400&height=250&seq=1&orientation=landscape"
+                  alt="Kapadokya Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">Kapadokya Balon Turu</h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Nevşehir, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺3.250</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    2-3 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 2 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Scenic%20view%20of%20Istanbul%20with%20Hagia%20Sophia%20and%20Blue%20Mosque%20visible%20across%20Bosphorus%20strait%2C%20beautiful%20sunset%20with%20golden%20light%20reflecting%20on%20water%2C%20iconic%20Turkish%20cityscape&width=400&height=250&seq=2&orientation=landscape"
+                  alt="İstanbul Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  İstanbul Tarihi Yarımada Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">İstanbul, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺1.750</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    Günübirlik
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 3 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20view%20of%20Pamukkale%20thermal%20pools%20in%20Turkey%20with%20white%20travertine%20terraces%20filled%20with%20blue%20water%2C%20natural%20limestone%20formations%20under%20clear%20blue%20sky%2C%20UNESCO%20world%20heritage%20site&width=400&height=250&seq=3&orientation=landscape"
+                  alt="Pamukkale Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Pamukkale & Hierapolis Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Denizli, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺2.450</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    2-3 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 4 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20coastal%20view%20of%20Bodrum%20with%20white%20houses%2C%20turquoise%20blue%20sea%2C%20luxury%20yachts%20in%20marina%2C%20Bodrum%20Castle%20visible%20on%20peninsula%2C%20typical%20Mediterranean%20architecture%20under%20bright%20sunny%20sky&width=400&height=250&seq=4&orientation=landscape"
+                  alt="Bodrum Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">Bodrum Mavi Yolculuk</h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Muğla, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺5.900</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    4-7 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 5 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Ancient%20ruins%20of%20Ephesus%20in%20Turkey%20with%20well-preserved%20Library%20of%20Celsus%2C%20marble%20columns%20and%20pathways%2C%20archaeological%20site%20under%20blue%20sky%2C%20historical%20Roman%20architecture%20in%20natural%20setting&width=400&height=250&seq=5&orientation=landscape"
+                  alt="Efes Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Efes Antik Kenti Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">İzmir, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺1.950</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    Günübirlik
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 6 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20landscape%20of%20Mount%20Ararat%20in%20Turkey%20with%20snow-capped%20peaks%2C%20green%20valleys%20and%20meadows%20in%20foreground%2C%20dramatic%20clouds%2C%20natural%20wilderness%20area%20under%20blue%20sky&width=400&height=250&seq=6&orientation=landscape"
+                  alt="Ağrı Dağı Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Ağrı Dağı Trekking Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Ağrı, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺4.750</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    4-7 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 7 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20coastal%20view%20of%20Antalya%20with%20turquoise%20Mediterranean%20sea%2C%20sandy%20beaches%2C%20luxury%20resorts%20along%20coastline%2C%20palm%20trees%20and%20mountains%20in%20background%2C%20sunny%20summer%20day&width=400&height=250&seq=7&orientation=landscape"
+                  alt="Antalya Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Antalya Kemer Sahil Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Antalya, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺3.850</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    4-7 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 8 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20landscape%20of%20Uzung%C3%B6l%20in%20Trabzon%2C%20Turkey%20with%20lake%20surrounded%20by%20lush%20green%20mountains%2C%20traditional%20wooden%20houses%2C%20mosque%20with%20minaret%2C%20reflections%20in%20calm%20water&width=400&height=250&seq=8&orientation=landscape"
+                  alt="Karadeniz Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Karadeniz Yaylaları Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Trabzon, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺4.250</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    4-7 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tour Card 9 -->
+            <div
+              class="tour-card bg-white rounded-lg shadow-sm overflow-hidden"
+            >
+              <div class="relative">
+                <img
+                  src="https://readdy.ai/api/search-image?query=Beautiful%20landscape%20of%20G%C3%B6reme%20National%20Park%20in%20Cappadocia%2C%20Turkey%20with%20unique%20rock%20formations%2C%20fairy%20chimneys%2C%20ancient%20cave%20dwellings%2C%20hot%20air%20balloons%20flying%20in%20distance%2C%20sunrise%20with%20golden%20light&width=400&height=250&seq=9&orientation=landscape"
+                  alt="Göreme Turu"
+                  class="w-full h-48 object-cover object-top"
+                />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-full text-gray-600 hover:text-primary transition-colors"
+                >
+                  <i class="ri-heart-line ri-lg"></i>
+                </button>
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-lg mb-1">
+                  Göreme Açık Hava Müzesi Turu
+                </h3>
+                <div class="flex items-center text-gray-600 mb-3">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-map-pin-line"></i>
+                  </div>
+                  <span class="text-sm">Nevşehir, Türkiye</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div>
+                    <span class="text-xs text-gray-500"
+                      >Başlayan fiyatlarla</span
+                    >
+                    <div class="font-bold text-lg text-primary">₺2.150</div>
+                  </div>
+                  <div
+                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                  >
+                    2-3 Gün
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 !rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    Detaylar
+                  </button>
+                  <button
+                    class="flex-1 bg-primary text-white py-2 !rounded-button hover:bg-opacity-90 transition-colors whitespace-nowrap"
+                  >
+                    Rezervasyon
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Pagination -->
+          <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-1">
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                <i class="ri-arrow-left-s-line ri-lg"></i>
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded bg-primary text-white"
+              >
+                1
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                2
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                3
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                4
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                5
+              </button>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                <i class="ri-arrow-right-s-line ri-lg"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Mobile Menu -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" id="mobileMenu">
+      <div class="bg-white h-full w-64 p-6">
+        <div class="flex justify-between items-center mb-6">
+          <a href="#" class="flex items-center">
+            <img src="https://readdy.ai/api/search-image?query=green%20leaf%20logo%20for%20travel%20company&width=40&height=40&seq=1" alt="Yeşil Yolculuk Logo" class="w-10 h-10 mr-2">
+            <span class="text-lg font-semibold text-gray-800">Yeşil Yolculuk</span>
+          </a>
+          <button id="closeMobileMenu" class="text-gray-600 hover:text-primary">
+            <i class="ri-close-line ri-xl"></i>
+          </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+          <a href="index.html" class="text-gray-600 hover:text-primary transition-colors">Ana Sayfa</a>
+          <a href="turlar.html" class="text-primary font-medium">Turlar</a>
+          <a href="hakkimizda.html" class="text-gray-600 hover:text-primary transition-colors">Hakkımızda</a>
+          <a href="iletisim.html" class="text-gray-600 hover:text-primary transition-colors">İletişim</a>
+        </nav>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Mobile Menu
+        const mobileMenuBtn = document.querySelector('.ri-menu-line').parentElement;
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+          mobileMenu.classList.remove('hidden');
+        });
+
+        closeMobileMenu.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+
+        // Price Range Slider
+        const priceRange = document.getElementById("priceRange");
+        const priceValue = document.getElementById("priceValue");
+        
+        function updatePriceValue(value) {
+          const formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          priceValue.textContent = `₺${formattedValue}`;
+        }
+
+        priceRange.addEventListener("input", function () {
+          updatePriceValue(this.value);
+        });
+
+        // View Toggle
+        const gridViewBtn = document.querySelector('.ri-layout-grid-line').parentElement;
+        const listViewBtn = document.querySelector('.ri-list-check-line').parentElement;
+        const tourGrid = document.querySelector('.grid');
+
+        function updateView(isGridView) {
+          if (isGridView) {
+            gridViewBtn.classList.remove('bg-gray-100');
+            gridViewBtn.classList.add('bg-primary');
+            gridViewBtn.querySelector('i').classList.add('text-white');
+            listViewBtn.classList.remove('bg-primary');
+            listViewBtn.classList.add('bg-gray-100');
+            listViewBtn.querySelector('i').classList.remove('text-white');
+            tourGrid.classList.remove('grid-cols-1');
+            tourGrid.classList.add('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+          } else {
+            listViewBtn.classList.remove('bg-gray-100');
+            listViewBtn.classList.add('bg-primary');
+            listViewBtn.querySelector('i').classList.add('text-white');
+            gridViewBtn.classList.remove('bg-primary');
+            gridViewBtn.classList.add('bg-gray-100');
+            gridViewBtn.querySelector('i').classList.remove('text-white');
+            tourGrid.classList.remove('md:grid-cols-2', 'lg:grid-cols-3');
+            tourGrid.classList.add('grid-cols-1');
+          }
+        }
+
+        gridViewBtn.addEventListener('click', () => updateView(true));
+        listViewBtn.addEventListener('click', () => updateView(false));
+
+        // Filter Apply Button
+        const filterApplyBtn = document.querySelector('button.w-full.bg-primary');
+        filterApplyBtn.addEventListener('click', function () {
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-0';
+          toast.textContent = 'Filtreler uygulandı';
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            toast.classList.add('translate-y-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+          }, 2000);
+        });
+
+        // Pagination
+        const paginationButtons = document.querySelectorAll('nav button');
+        let currentPage = 1;
+
+        function updatePagination(page) {
+          paginationButtons.forEach((btn, index) => {
+            if (!btn.querySelector('i')) {
+              if (index === page) {
+                btn.classList.remove('border', 'border-gray-300', 'text-gray-600');
+                btn.classList.add('bg-primary', 'text-white');
+              } else {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('border', 'border-gray-300', 'text-gray-600');
+              }
+            }
+          });
+          currentPage = page;
+        }
+
+        paginationButtons.forEach((button, index) => {
+          if (!button.querySelector('i')) {
+            button.addEventListener('click', () => updatePagination(index));
+          } else if (button.querySelector('.ri-arrow-left-s-line')) {
+            button.addEventListener('click', () => {
+              if (currentPage > 1) updatePagination(currentPage - 1);
+            });
+          } else if (button.querySelector('.ri-arrow-right-s-line')) {
+            button.addEventListener('click', () => {
+              if (currentPage < 5) updatePagination(currentPage + 1);
+            });
+          }
+        });
+
+        // Tour Card Buttons
+        function createModal(title, content) {
+          const modal = document.createElement('div');
+          modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+          modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+              <h3 class="text-xl font-semibold mb-4">${title}</h3>
+              <p class="text-gray-600 mb-6">${content}</p>
+              <button class="bg-primary text-white px-4 py-2 rounded-button">Kapat</button>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          modal.querySelector('button').addEventListener('click', () => modal.remove());
+        }
+
+        document.querySelectorAll('button:contains("Detaylar")').forEach(button => {
+          button.addEventListener('click', function() {
+            const tourName = this.closest('.tour-card').querySelector('h3').textContent;
+            createModal(`${tourName} - Detaylar`, 'Bu tur hakkında detaylı bilgi yakında eklenecektir.');
+          });
+        });
+
+        document.querySelectorAll('button:contains("Rezervasyon")').forEach(button => {
+          button.addEventListener('click', function() {
+            const tourName = this.closest('.tour-card').querySelector('h3').textContent;
+            createModal(`${tourName} - Rezervasyon`, 'Rezervasyon sistemi yakında aktif olacaktır.');
+          });
+        });
+
+        // Clear Filters
+        const clearFiltersBtn = document.querySelector('button:contains("Temizle")');
+        clearFiltersBtn.addEventListener('click', function() {
+          document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+          document.querySelector('input[type="range"]').value = 5000;
+          updatePriceValue(5000);
+          document.querySelector('input[type="date"]').value = '';
+          document.querySelectorAll('.select-selected span').forEach(span => {
+            const select = span.closest('.custom-select').querySelector('select');
+            if (select.id === 'locationSelect') span.textContent = 'Tüm Konumlar';
+            else if (select.id === 'sortSelect') span.textContent = 'Popülerlik';
+            else if (select.id === 'perPageSelect') span.textContent = '12';
+          });
+        });
+
+        // Custom Select
+        const customSelects = document.querySelectorAll('.custom-select');
+        customSelects.forEach(select => {
+          const selectSelected = select.querySelector('.select-selected');
+          const selectItems = select.querySelector('.select-items');
+          const selectOptions = selectItems.querySelectorAll('div');
+
+          selectSelected.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeAllSelect(this);
+            selectItems.classList.toggle('select-hide');
+            this.classList.toggle('select-arrow-active');
+          });
+
+          selectOptions.forEach(option => {
+            option.addEventListener('click', function() {
+              const selectedValue = this.textContent;
+              selectSelected.querySelector('span').textContent = selectedValue;
+              selectItems.classList.add('select-hide');
+            });
+          });
+        });
+
+        function closeAllSelect(elmnt) {
+          const selectItems = document.querySelectorAll('.select-items');
+          const selectSelected = document.querySelectorAll('.select-selected');
+          selectItems.forEach((items, index) => {
+            if (elmnt != selectSelected[index]) {
+              items.classList.add('select-hide');
+              selectSelected[index].classList.remove('select-arrow-active');
+            }
+          });
+        }
+
+        document.addEventListener('click', closeAllSelect);
+
+        // Favorite Button
+        document.querySelectorAll('.tour-card button i.ri-heart-line').forEach(button => {
+          button.addEventListener('click', function() {
+            if (this.classList.contains('ri-heart-line')) {
+              this.classList.remove('ri-heart-line');
+              this.classList.add('ri-heart-fill', 'text-red-500');
+            } else {
+              this.classList.remove('ri-heart-fill', 'text-red-500');
+              this.classList.add('ri-heart-line');
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
