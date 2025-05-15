@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { corsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,21 +8,25 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const tours = await prisma.tour.findMany({
-      orderBy: {
-        startDate: 'asc',
-      },
       include: {
         category: true,
-        images: true,
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
-    return NextResponse.json(tours);
+    return NextResponse.json(tours, { headers: corsHeaders });
   } catch (error) {
     console.error('Error fetching tours:', error);
     return NextResponse.json(
-      { error: 'Turlar yüklenirken bir hata oluştu' },
-      { status: 500 }
+      { error: 'Internal Server Error' },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -157,4 +162,11 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  });
 } 

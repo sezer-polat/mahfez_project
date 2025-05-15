@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { corsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,14 +18,14 @@ export async function GET(
       },
       include: {
         category: true,
-        images: {
-          orderBy: {
-            order: 'asc',
-          },
-        },
         itinerary: {
           orderBy: {
             day: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
       },
@@ -32,17 +33,17 @@ export async function GET(
 
     if (!tour) {
       return NextResponse.json(
-        { error: 'Tur bulunamadı' },
-        { status: 404 }
+        { error: 'Tour not found' },
+        { status: 404, headers: corsHeaders }
       );
     }
 
-    return NextResponse.json(tour);
+    return NextResponse.json(tour, { headers: corsHeaders });
   } catch (error) {
     console.error('Error fetching tour:', error);
     return NextResponse.json(
-      { error: 'Tur bilgileri yüklenirken bir hata oluştu' },
-      { status: 500 }
+      { error: 'Internal Server Error' },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -84,4 +85,11 @@ export async function DELETE(
       { status: 500 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  });
 } 
