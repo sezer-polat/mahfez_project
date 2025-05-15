@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
-import { BookingStatus } from '@prisma/client';
+import { Status } from '@prisma/client';
 
 export async function GET(req: Request) {
   try {
@@ -60,7 +60,7 @@ export async function GET(req: Request) {
       case 'financial':
         data = await prisma.booking.findMany({
           where: {
-            status: BookingStatus.COMPLETED,
+            status: Status.CONFIRMED,
             createdAt: {
               gte: start,
               lte: end
