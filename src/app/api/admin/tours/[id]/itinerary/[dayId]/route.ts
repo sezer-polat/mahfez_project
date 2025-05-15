@@ -28,7 +28,7 @@ export async function PUT(
         activities,
         meals,
         accommodation,
-        ...(order !== undefined && { order }),
+        order: order ?? 0
       },
     });
 
