@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, validatePassword } from '@/lib/auth';
+import { corsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version',
-  'Access-Control-Max-Age': '86400',
-};
 
 export async function POST(request: Request) {
   try {
@@ -74,7 +68,16 @@ export async function POST(request: Request) {
     console.log('User created successfully:', { userId: user.id, email: user.email });
 
     return NextResponse.json(
-      { message: 'Kullanıcı başarıyla oluşturuldu', userId: user.id },
+      { 
+        message: 'Kullanıcı başarıyla oluşturuldu', 
+        userId: user.id,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        }
+      },
       { status: 201, headers: corsHeaders }
     );
   } catch (error) {
