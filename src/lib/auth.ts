@@ -13,73 +13,55 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            console.log('Missing credentials');
-            throw new Error("Email ve şifre gereklidir");
-          }
-
-          console.log('Looking for user:', credentials.email);
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email,
-            },
-          });
-
-          if (!user) {
-            console.log('User not found');
-            throw new Error("Kullanıcı bulunamadı");
-          }
-
-          console.log('Comparing passwords');
-          const isPasswordValid = await compare(credentials.password, user.password);
-
-          if (!isPasswordValid) {
-            console.log('Invalid password');
-            throw new Error("Geçersiz şifre");
-          }
-
-          console.log('Login successful');
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name || '',
-            role: user.role,
-          };
-        } catch (error) {
-          console.error('Auth error:', error);
-          throw error;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email ve şifre gereklidir");
         }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user) {
+          throw new Error("Kullanıcı bulunamadı");
+        }
+
+        const isPasswordValid = await compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Geçersiz şifre");
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name || '',
+          role: user.role,
+        };
       },
     }),
   ],
+  pages: {
+    signIn: "/giris",
+    error: "/giris",
+  },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  pages: {
-    signIn: "/giris",
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        return {
-          ...token,
-          id: user.id,
-          role: user.role,
-        };
+        token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id,
-          role: token.role,
-        },
-      };
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
@@ -95,7 +77,6 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export function validatePassword(password: string): { isValid: boolean; message?: string } {
-  // En az 8 karakter
   if (password.length < 8) {
     return {
       isValid: false,
@@ -103,7 +84,6 @@ export function validatePassword(password: string): { isValid: boolean; message?
     };
   }
 
-  // En az bir büyük harf
   if (!/[A-Z]/.test(password)) {
     return {
       isValid: false,
@@ -111,7 +91,6 @@ export function validatePassword(password: string): { isValid: boolean; message?
     };
   }
 
-  // En az bir küçük harf
   if (!/[a-z]/.test(password)) {
     return {
       isValid: false,
@@ -119,7 +98,6 @@ export function validatePassword(password: string): { isValid: boolean; message?
     };
   }
 
-  // En az bir rakam
   if (!/[0-9]/.test(password)) {
     return {
       isValid: false,
@@ -127,7 +105,6 @@ export function validatePassword(password: string): { isValid: boolean; message?
     };
   }
 
-  // En az bir özel karakter
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     return {
       isValid: false,

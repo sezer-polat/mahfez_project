@@ -12,9 +12,9 @@ export async function POST(req: Request) {
     const { email, password, name } = body;
 
     if (!email || !password || !name) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Email, şifre ve isim gereklidir' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Email, şifre ve isim gereklidir' },
+        { status: 400 }
       );
     }
 
@@ -25,25 +25,25 @@ export async function POST(req: Request) {
       });
 
       if (existingUser) {
-        return new NextResponse(
-          JSON.stringify({ error: 'Bu e-posta adresi zaten kullanılıyor' }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        return NextResponse.json(
+          { error: 'Bu e-posta adresi zaten kullanılıyor' },
+          { status: 400 }
         );
       }
     } catch (dbError) {
       console.error('Database error:', dbError);
-      return new NextResponse(
-        JSON.stringify({ error: 'Veritabanı bağlantı hatası' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Veritabanı bağlantı hatası' },
+        { status: 500 }
       );
     }
 
     // Şifre karmaşıklığı kontrolü
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      return new NextResponse(
-        JSON.stringify({ error: passwordValidation.message }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: passwordValidation.message },
+        { status: 400 }
       );
     }
 
@@ -53,9 +53,9 @@ export async function POST(req: Request) {
       hashedPassword = await hashPassword(password);
     } catch (hashError) {
       console.error('Password hash error:', hashError);
-      return new NextResponse(
-        JSON.stringify({ error: 'Şifre işleme hatası' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Şifre işleme hatası' },
+        { status: 500 }
       );
     }
 
@@ -72,22 +72,22 @@ export async function POST(req: Request) {
 
       console.log('Created user:', { ...user, password: '[REDACTED]' });
 
-      return new NextResponse(
-        JSON.stringify({ message: 'Kullanıcı başarıyla oluşturuldu' }),
-        { status: 201, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { message: 'Kullanıcı başarıyla oluşturuldu' },
+        { status: 201 }
       );
     } catch (createError) {
       console.error('User creation error:', createError);
-      return new NextResponse(
-        JSON.stringify({ error: 'Kullanıcı oluşturma hatası' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Kullanıcı oluşturma hatası' },
+        { status: 500 }
       );
     }
   } catch (error) {
     console.error('General error:', error);
-    return new NextResponse(
-      JSON.stringify({ error: 'Bir hata oluştu: ' + (error as Error).message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Bir hata oluştu: ' + (error as Error).message },
+      { status: 500 }
     );
   }
 } 
