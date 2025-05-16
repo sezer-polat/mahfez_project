@@ -27,8 +27,6 @@ export async function GET() {
       take: 3, // En son 3 rezervasyonu göster
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
         numberOfPeople: true,
         totalPrice: true,
         status: true,
