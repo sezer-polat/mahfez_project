@@ -4,33 +4,6 @@ import { corsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
 
-// GET: Tüm turları getir
-export default async function GET() {
-  try {
-    const tours = await prisma.tour.findMany({
-      include: {
-        category: true,
-        images: {
-          orderBy: {
-            order: 'asc',
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    return NextResponse.json(tours, { headers: corsHeaders });
-  } catch (error) {
-    console.error('Error fetching tours:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500, headers: corsHeaders }
-    );
-  }
-}
-
 // POST: Yeni tur oluştur
 export default async function POST(request: Request) {
   try {
@@ -162,11 +135,4 @@ export default async function POST(request: Request) {
       { status: 500, headers: corsHeaders }
     );
   }
-}
-
-export default async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders
-  });
 } 
