@@ -4,6 +4,14 @@ import { corsHeaders } from "@/lib/cors";
 
 const handler = NextAuth(authOptions);
 
+export async function GET(request: Request) {
+  return handleRequest(request, handler);
+}
+
+export async function POST(request: Request) {
+  return handleRequest(request, handler);
+}
+
 async function handleRequest(request: Request, handler: any) {
   try {
     const response = await handler(request);
@@ -60,14 +68,6 @@ async function handleRequest(request: Request, handler: any) {
       }
     );
   }
-}
-
-export async function GET(request: Request) {
-  return handleRequest(request, handler);
-}
-
-export async function POST(request: Request) {
-  return handleRequest(request, handler);
 }
 
 export async function OPTIONS(request: Request) {
