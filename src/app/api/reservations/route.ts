@@ -91,19 +91,26 @@ export async function GET() {
       where: {
         email: session.user.email
       },
-      include: {
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        numberOfPeople: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
         tour: {
           select: {
             title: true,
             image: true,
             startDate: true,
-            endDate: true
-          }
-        }
+            endDate: true,
+          },
+        },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
     });
 
     console.log('Found reservations:', reservations); // Debug log

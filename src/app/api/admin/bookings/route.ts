@@ -14,15 +14,25 @@ export async function GET() {
     }
 
     const reservations = await prisma.reservation.findMany({
-      include: {
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        numberOfPeople: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
         tour: {
           select: {
             title: true,
+            image: true,
+            startDate: true,
+            endDate: true,
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
 

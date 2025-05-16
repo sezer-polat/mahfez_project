@@ -70,7 +70,14 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc'
       },
-      include: {
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        numberOfPeople: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
         tour: {
           select: {
             title: true,

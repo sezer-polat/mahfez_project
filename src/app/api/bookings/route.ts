@@ -23,14 +23,28 @@ export async function GET(req: Request) {
       where: {
         userId: session.user.id
       },
-      include: {
-        tour: true
-      },
       orderBy: {
         createdAt: 'desc'
       },
       skip,
-      take: limit
+      take: limit,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        numberOfPeople: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
+        tour: {
+          select: {
+            title: true,
+            image: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+      },
     });
 
     const total = await prisma.booking.count({

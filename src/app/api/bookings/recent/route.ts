@@ -21,17 +21,27 @@ export async function GET() {
       where: {
         userId: session.user.id,
       },
-      include: {
-        tour: {
-          include: {
-            category: true,
-          },
-        },
-      },
       orderBy: {
         createdAt: 'desc',
       },
       take: 3, // En son 3 rezervasyonu göster
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        numberOfPeople: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
+        tour: {
+          select: {
+            title: true,
+            image: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(recentBookings);
