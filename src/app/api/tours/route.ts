@@ -5,7 +5,7 @@ import { corsHeaders } from '@/lib/cors';
 export const dynamic = 'force-dynamic';
 
 // GET: Tüm turları getir
-export default async function GET() {
+export async function GET() {
   try {
     const tours = await prisma.tour.findMany({
       include: {
@@ -32,7 +32,7 @@ export default async function GET() {
 }
 
 // POST: Yeni tur oluştur
-export default async function POST(request: Request) {
+export async function POST(request: Request) {
   try {
     const data = await request.json();
     
@@ -164,7 +164,7 @@ export default async function POST(request: Request) {
   }
 }
 
-export default async function OPTIONS() {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
     headers: corsHeaders
