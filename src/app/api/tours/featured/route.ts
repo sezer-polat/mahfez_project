@@ -9,17 +9,19 @@ export async function GET() {
     const featuredTours = await prisma.tour.findMany({
       where: {
         isActive: true,
-        startDate: {
-          gt: new Date(), // Başlangıç tarihi bugünden sonra olan turlar
-        },
+        startDate: { gt: new Date() },
       },
-      include: {
-        category: true,
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        image: true,
+        startDate: true,
+        endDate: true,
+        category: { select: { name: true } },
       },
-      orderBy: {
-        startDate: 'asc',
-      },
-      take: 6, // En fazla 6 tur göster
+      orderBy: { startDate: 'asc' },
+      take: 6,
     });
 
     return NextResponse.json(featuredTours);

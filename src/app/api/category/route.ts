@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 
 // Kategorileri listele ve yeni kategori ekle
 export async function GET() {
-  const categories = await prisma.category.findMany();
+  const categories = await prisma.category.findMany({
+    select: { id: true, name: true, description: true }
+  });
   return NextResponse.json(categories);
 }
 

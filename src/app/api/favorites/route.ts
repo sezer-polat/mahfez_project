@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +16,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
+      select: { id: true }
     });
 
     if (!user) {
@@ -26,7 +25,7 @@ export async function GET() {
 
     const favorites = await prisma.favorite.findMany({
       where: { userId: user.id },
-      include: {
+      select: {
         tour: {
           select: {
             id: true,
@@ -38,9 +37,7 @@ export async function GET() {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json(favorites);

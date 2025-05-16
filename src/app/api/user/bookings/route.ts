@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Status } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -13,9 +12,8 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email
-      }
+      where: { email: session.user.email },
+      select: { id: true }
     });
 
     if (!user) {
@@ -25,9 +23,10 @@ export async function GET() {
     const bookings = await prisma.booking.findMany({
       where: {
         userId: user.id,
-        status: Status.CONFIRMED
+        status: 'CONFIRMED'
       },
-      include: {
+      select: {
+        id: true,
         tour: {
           select: {
             title: true,
@@ -35,11 +34,10 @@ export async function GET() {
             endDate: true,
             price: true
           }
-        }
+        },
+        createdAt: true
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     });
 
     return NextResponse.json(bookings);
@@ -100,7 +98,7 @@ export async function POST(request: Request) {
         userId: user.id,
         tourId: tourId,
         status: {
-          in: [Status.CONFIRMED]
+          in: ['CONFIRMED']
         }
       }
     });
@@ -113,7 +111,7 @@ export async function POST(request: Request) {
       data: {
         userId: user.id,
         tourId: tourId,
-        status: Status.CONFIRMED,
+        status: 'CONFIRMED',
         numberOfPeople: 1,
         totalPrice: tour.price
       },

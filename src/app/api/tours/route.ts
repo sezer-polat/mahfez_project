@@ -8,19 +8,18 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const tours = await prisma.tour.findMany({
-      include: {
-        category: true,
-        images: {
-          orderBy: {
-            order: 'asc',
-          },
-        },
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        image: true,
+        startDate: true,
+        endDate: true,
+        isActive: true,
+        category: { select: { name: true } },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
-
     return NextResponse.json(tours, { headers: corsHeaders });
   } catch (error) {
     console.error('Error fetching tours:', error);

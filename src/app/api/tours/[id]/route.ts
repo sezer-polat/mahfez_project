@@ -13,20 +13,32 @@ export async function GET(
 ) {
   try {
     const tour = await prisma.tour.findUnique({
-      where: {
-        id: params.id,
-      },
-      include: {
-        category: true,
+      where: { id: params.id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        image: true,
+        startDate: true,
+        endDate: true,
+        isActive: true,
+        category: { select: { name: true } },
         itinerary: {
-          orderBy: {
-            day: 'asc',
+          select: {
+            id: true,
+            day: true,
+            title: true,
+            description: true,
+            activities: true,
+            meals: true,
+            accommodation: true,
           },
+          orderBy: { day: 'asc' },
         },
         images: {
-          orderBy: {
-            order: 'asc',
-          },
+          select: { id: true, url: true, title: true, order: true },
+          orderBy: { order: 'asc' },
         },
       },
     });
