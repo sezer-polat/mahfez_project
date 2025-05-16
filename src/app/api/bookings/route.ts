@@ -30,8 +30,6 @@ export async function GET(req: Request) {
       take: limit,
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
         numberOfPeople: true,
         totalPrice: true,
         status: true,
