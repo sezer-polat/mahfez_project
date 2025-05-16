@@ -34,8 +34,10 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.49.4",
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^20.17.46",
+    "@types/cookie": "^0.6.0",
+    "@types/node": "^20.17.47",
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^18",
     "@types/react-dom": "^18",

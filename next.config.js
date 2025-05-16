@@ -57,6 +57,15 @@ const nextConfig = {
     }
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/turlar',
+        destination: '/tours',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig 
