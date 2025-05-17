@@ -4,19 +4,23 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
-  const isAdminPage = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginPage = request.nextUrl.pathname === "/admin/giris";
+  const isAdminPath = request.nextUrl.pathname.startsWith('/admin');
+  const isLoginPath = request.nextUrl.pathname === '/admin/giris';
 
-  // Admin sayfaları için kontrol
-  if (isAdminPage) {
-    // Giriş sayfasındaysa ve token varsa admin paneline yönlendir
-    if (isLoginPage && token?.role === "ADMIN") {
-      return NextResponse.redirect(new URL("/admin", request.url));
+  // Admin sayfalarına erişim kontrolü
+  if (isAdminPath) {
+    // Giriş sayfasına erişim kontrolü
+    if (isLoginPath) {
+      // Eğer kullanıcı zaten giriş yapmış ve admin ise dashboard'a yönlendir
+      if (token?.role === 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
+      return NextResponse.next();
     }
 
-    // Giriş sayfası değilse ve token yoksa veya admin değilse giriş sayfasına yönlendir
-    if (!isLoginPage && (!token || token.role !== "ADMIN")) {
-      return NextResponse.redirect(new URL("/admin/giris", request.url));
+    // Diğer admin sayfalarına erişim kontrolü
+    if (!token || token.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/admin/giris', request.url));
     }
   }
 
@@ -37,5 +41,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/:path*"],
+  matcher: [
+    '/admin/:path*',
+  ],
 }; 
