@@ -402,8 +402,8 @@ export default function ProfilePage() {
                           <div className="flex items-start space-x-4">
                             <div className="relative h-24 w-24 flex-shrink-0">
                               <Image
-                                src={reservation.tour.image}
-                                alt={reservation.tour.title}
+                                src={reservation.tour?.image || '/images/default-tour.jpg'}
+                                alt={reservation.tour?.title || 'Tur'}
                                 fill
                                 className="object-cover rounded-lg"
                               />
@@ -458,8 +458,8 @@ export default function ProfilePage() {
                         <div key={favorite.id} className="border rounded-lg overflow-hidden">
                           <div className="relative h-48">
                             <Image
-                              src={favorite.tour.image}
-                              alt={favorite.tour.title}
+                              src={favorite.tour?.image || '/images/default-tour.jpg'}
+                              alt={favorite.tour?.title || 'Tur'}
                               fill
                               className="object-cover"
                             />

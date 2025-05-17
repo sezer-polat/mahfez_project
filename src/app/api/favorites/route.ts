@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import redis from '@/lib/redis';
 import { Pool } from 'pg';
+import { customAlphabet } from 'nanoid';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const cuid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 24);
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +46,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { userId, tourId } = body;
+    const now = new Date();
+    const id = cuid();
 
     // Aynı favori var mı kontrol et
     const existing = await pool.query('SELECT id FROM "Favorite" WHERE userId = $1 AND tourId = $2', [userId, tourId]);
@@ -55,8 +59,8 @@ export async function POST(request: Request) {
     }
 
     const insertResult = await pool.query(
-      'INSERT INTO "Favorite" (userId, tourId) VALUES ($1, $2) RETURNING *',
-      [userId, tourId]
+      'INSERT INTO "Favorite" (id, userId, tourId, createdAt, updatedAt) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [id, userId, tourId, now, now]
     );
     const favorite = insertResult.rows[0];
 
