@@ -24,7 +24,7 @@ export async function GET() {
   `);
   data = result.rows.map(row => ({
     ...row,
-    category: row.category_name ? { name: row.category_name } : null,
+    category: row.category_name ? { name: row.category_name } : { name: 'Kategori Yok' },
   }));
 
   await redis.set('tours', JSON.stringify(data), 'EX', 3600);

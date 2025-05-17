@@ -141,14 +141,14 @@ function ToursContent() {
   const filteredTours = tours.filter(tour => {
     // Her zaman fiyat filtresini uygula
     const matchesPrice = tour.price <= priceRange;
-    
+
     // Eğer tüm turlar seçiliyse sadece fiyat filtresini uygula
     if (showAllTours) {
       return matchesPrice;
     }
-    
-    // Tüm turlar seçili değilse hem kategori hem fiyat filtresini uygula
-    const matchesCategory = !selectedCategory || (tour.category && tour.category.name === selectedCategory);
+
+    // Kategorisi olmayan turlar da filtreye takılmasın
+    const matchesCategory = !selectedCategory || (tour.category?.name === selectedCategory) || !tour.category;
     return matchesCategory && matchesPrice;
   }).sort((a, b) => {
     switch (sortBy) {
