@@ -167,13 +167,13 @@ export default function ToursPage() {
   return (
     <>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Turlar</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Tours</h1>
         <button
           onClick={() => router.push('/admin/tours/new')}
           className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center"
         >
           <i className="ri-add-line mr-2"></i>
-          Yeni Tur Ekle
+          Add New Tour
         </button>
       </div>
 

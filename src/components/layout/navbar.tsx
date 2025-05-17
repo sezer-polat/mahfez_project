@@ -32,9 +32,9 @@ export function Navbar() {
               Ana Sayfa
             </Link>
             <Link
-              href="/turlar"
+              href="/tours"
               className={`text-sm font-medium transition-colors ${
-                isActive('/turlar') ? 'text-primary' : 'text-gray-600 hover:text-primary'
+                isActive('/tours') ? 'text-primary' : 'text-gray-600 hover:text-primary'
               }`}
             >
               Turlar

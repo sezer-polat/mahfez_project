@@ -50,7 +50,7 @@ export default function Sidebar() {
             className={`flex items-center px-4 py-2 rounded-lg ${isActive('/admin/tours')}`}
           >
             <i className="ri-map-pin-line mr-3"></i>
-            Turlar
+            Tours
           </Link>
           <Link
             href="/admin/categories"
