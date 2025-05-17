@@ -3,10 +3,15 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  });
+
   const isAdminPath = request.nextUrl.pathname.startsWith('/admin');
   const isLoginPath = request.nextUrl.pathname === '/admin/giris';
   const isRootAdminPath = request.nextUrl.pathname === '/admin';
+  const isDashboardPath = request.nextUrl.pathname === '/admin/dashboard';
 
   // Admin sayfalarına erişim kontrolü
   if (isAdminPath) {
@@ -27,9 +32,15 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
 
-    // Diğer admin sayfalarına erişim kontrolü
-    if (!token || token.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/admin/giris', request.url));
+    // Dashboard ve diğer admin sayfalarına erişim kontrolü
+    if (isDashboardPath || !isLoginPath) {
+      if (!token) {
+        return NextResponse.redirect(new URL('/admin/giris', request.url));
+      }
+
+      if (token.role !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin/giris', request.url));
+      }
     }
   }
 
