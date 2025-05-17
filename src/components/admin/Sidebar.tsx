@@ -124,6 +124,15 @@ export default function Sidebar() {
             <i className="ri-mail-line mr-3"></i>
             İletişim Mesajları
           </button>
+          <button
+            onClick={() => handleNavigation('/admin/slider')}
+            className={`flex items-center w-full px-4 py-2 rounded-lg ${isActive('/admin/slider')}`}
+            aria-label="Slider Yönetimi"
+            aria-current={isCurrent('/admin/slider') ? 'page' : undefined}
+          >
+            <i className="ri-slideshow-line mr-3"></i>
+            Slider Yönetimi
+          </button>
         </nav>
 
         {/* User Info */}
