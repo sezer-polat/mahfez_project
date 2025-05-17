@@ -54,42 +54,31 @@ export async function POST(request: Request) {
   }
 }
 
+// DELETE: Favori sil
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    console.log('Session:', session); // Debug için
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
     const tourId = searchParams.get('tourId');
 
-    if (!tourId) {
-      return NextResponse.json({ error: 'Tour ID is required' }, { status: 400 });
+    if (!userId || !tourId) {
+      return NextResponse.json({ error: 'userId ve tourId zorunludur' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
+    const deleteResult = await pool.query(
+      'DELETE FROM "Favorite" WHERE userId = $1 AND tourId = $2 RETURNING *',
+      [userId, tourId]
+    );
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    // Cache'i temizle
+    await redis.del('favorites');
+
+    if (deleteResult.rowCount === 0) {
+      return NextResponse.json({ error: 'Favori bulunamadı' }, { status: 404 });
     }
-
-    await prisma.favorite.delete({
-      where: {
-        userId_tourId: {
-          userId: user.id,
-          tourId: tourId,
-        },
-      },
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting favorite:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Favori silinirken bir hata oluştu' }, { status: 500 });
   }
 } 
