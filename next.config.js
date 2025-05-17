@@ -60,8 +60,53 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/turlar',
-        destination: '/tours',
+        source: '/admin/turlar',
+        destination: '/admin/tours',
+        permanent: true,
+      },
+      {
+        source: '/admin/kategoriler',
+        destination: '/admin/categories',
+        permanent: true,
+      },
+      {
+        source: '/admin/rezervasyonlar',
+        destination: '/admin/bookings',
+        permanent: true,
+      },
+      {
+        source: '/admin/kullanicilar',
+        destination: '/admin/users',
+        permanent: true,
+      },
+      {
+        source: '/admin/raporlar',
+        destination: '/admin/reports',
+        permanent: true,
+      },
+      {
+        source: '/admin/ayarlar',
+        destination: '/admin/settings',
+        permanent: true,
+      },
+      {
+        source: '/admin/mesajlar',
+        destination: '/admin/messages',
+        permanent: true,
+      },
+      {
+        source: '/admin/yeni-tur',
+        destination: '/admin/tours/new',
+        permanent: true,
+      },
+      {
+        source: '/admin/tur-duzenle/:id',
+        destination: '/admin/tours/:id',
+        permanent: true,
+      },
+      {
+        source: '/admin/kategori-duzenle/:id',
+        destination: '/admin/categories/:id',
         permanent: true,
       },
     ];
