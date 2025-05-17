@@ -13,10 +13,13 @@ export default function AdminLogin() {
   const router = useRouter();
 
   useEffect(() => {
+    if (status === 'loading') return;
+    
     if (session?.user?.role === 'ADMIN') {
+      console.log('Session in useEffect:', session); // Debug için
       router.replace('/admin');
     }
-  }, [session, router]);
+  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,34 +35,17 @@ export default function AdminLogin() {
 
       if (result?.error) {
         setError(result.error);
-        setLoading(false);
         return;
       }
 
-      // Giriş başarılı, session güncellenmesini bekle
-      let tries = 0;
-      let isAdmin = false;
-      while (tries < 10) {
-        await new Promise((res) => setTimeout(res, 200));
-        const sess = (await import('next-auth/react')).useSession().data;
-        if (sess?.user?.role) {
-          isAdmin = sess.user.role === 'ADMIN';
-          break;
-        }
-        tries++;
+      if (result?.ok) {
+        console.log('Sign in successful, session:', await useSession()); // Debug için
+        router.push('/admin');
+        router.refresh();
       }
-
-      if (!isAdmin) {
-        setError('Bu sayfaya sadece yönetici (admin) girebilir.');
-        setLoading(false);
-        return;
-      }
-
-      // Admin ise panele yönlendir
-      router.push('/admin');
-      router.refresh();
     } catch (error) {
-      setError('Bir hata oluştu. Lütfen tekrar deneyin.');
+      console.error('Login error:', error);
+      setError('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setLoading(false);
     }

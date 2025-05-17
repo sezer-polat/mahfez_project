@@ -14,38 +14,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            console.error('Missing credentials');
-            throw new Error("Email ve şifre gereklidir");
-          }
-
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-
-          if (!user) {
-            console.error('User not found:', credentials.email);
-            throw new Error("Kullanıcı bulunamadı");
-          }
-
-          const isPasswordValid = await compare(credentials.password, user.password);
-
-          if (!isPasswordValid) {
-            console.error('Invalid password for user:', credentials.email);
-            throw new Error("Geçersiz şifre");
-          }
-
-          return {
-            id: String(user.id),
-            email: user.email,
-            name: user.name || '',
-            role: user.role as UserRole,
-          };
-        } catch (error) {
-          console.error('Auth error:', error);
-          throw error;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email ve şifre gereklidir");
         }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user) {
+          throw new Error("Kullanıcı bulunamadı");
+        }
+
+        const isPasswordValid = await compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Geçersiz şifre");
+        }
+
+        return {
+          id: String(user.id),
+          email: user.email,
+          name: user.name || '',
+          role: user.role as UserRole,
+        };
       },
     }),
   ],
@@ -59,28 +51,28 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      try {
-        if (user) {
-          token.id = user.id;
-          token.role = user.role as UserRole;
-        }
-        return token;
-      } catch (error) {
-        console.error('JWT callback error:', error);
-        return token;
+      if (user) {
+        return {
+          ...token,
+          id: user.id,
+          role: user.role,
+          email: user.email,
+          name: user.name,
+        };
       }
+      return token;
     },
     async session({ session, token }) {
-      try {
-        if (session.user) {
-          session.user.id = token.id as string;
-          session.user.role = token.role as UserRole;
-        }
-        return session;
-      } catch (error) {
-        console.error('Session callback error:', error);
-        return session;
-      }
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          role: token.role as UserRole,
+          email: token.email as string,
+          name: token.name as string,
+        },
+      };
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
