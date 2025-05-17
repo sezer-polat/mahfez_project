@@ -83,7 +83,23 @@ export async function POST(request: Request) {
       );
       await client.query('UPDATE "Tour" SET available = available - $1 WHERE id = $2', [numberOfPeople, tourId]);
       await client.query('COMMIT');
-      await redis.del('reservations');
+      // Rezervasyonlar güncellendi, güncel veriyi Redis'e yaz
+      const allReservations = await pool.query(`
+        SELECT r.*, t.title as tour_title, t.image as tour_image, t."startDate" as tour_startDate, t."endDate" as tour_endDate
+        FROM "Reservation" r
+        LEFT JOIN "Tour" t ON r."tourId" = t.id
+        ORDER BY r."createdAt" DESC
+      `);
+      const data = allReservations.rows.map(row => ({
+        ...row,
+        tour: {
+          title: row.tour_title,
+          image: row.tour_image,
+          startDate: row.tour_startDate,
+          endDate: row.tour_endDate,
+        }
+      }));
+      await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
       return NextResponse.json(reservationResult.rows[0]);
     } catch (err) {
       await client.query('ROLLBACK');
@@ -109,6 +125,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  // Önce Redis'ten veri çek
   let data: any = await redis.get('reservations');
   if (data) {
     // Cache'ten gelen veri eski formatta olabilir, dönüştür
@@ -137,7 +154,7 @@ export async function GET() {
     return NextResponse.json(parsed);
   }
 
-  // Rezervasyonları tur bilgisiyle birlikte çek
+  // Redis'te yoksa veritabanından çek
   const result = await pool.query(`
     SELECT r.*, t.title as tour_title, t.image as tour_image, t."startDate" as tour_startDate, t."endDate" as tour_endDate
     FROM "Reservation" r
@@ -154,8 +171,7 @@ export async function GET() {
     }
   }));
 
-  await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
-
+  await redis.set('reservations', JSON.stringify(data), 'EX', 3600); // 1 saat cache
   return NextResponse.json(data);
 }
 
@@ -175,8 +191,23 @@ export async function PUT(request: NextRequest) {
     if (result.rows.length === 0) {
       return NextResponse.json({ error: 'Rezervasyon bulunamadı' }, { status: 404 });
     }
-    // Cache'i temizle
-    await redis.del('reservations');
+    // Cache'i güncelle
+    const allReservations = await pool.query(`
+      SELECT r.*, t.title as tour_title, t.image as tour_image, t."startDate" as tour_startDate, t."endDate" as tour_endDate
+      FROM "Reservation" r
+      LEFT JOIN "Tour" t ON r."tourId" = t.id
+      ORDER BY r."createdAt" DESC
+    `);
+    const data = allReservations.rows.map(row => ({
+      ...row,
+      tour: {
+        title: row.tour_title,
+        image: row.tour_image,
+        startDate: row.tour_startDate,
+        endDate: row.tour_endDate,
+      }
+    }));
+    await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
     return NextResponse.json(result.rows[0]);
   } catch (error) {
     console.error('Rezervasyon güncelleme hatası:', error);

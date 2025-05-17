@@ -46,8 +46,10 @@ export async function POST(request: Request) {
     );
     const user = insertResult.rows[0];
 
-    // Cache'i temizle
-    await redis.del('users');
+    // Kullanıcılar güncellendi, güncel veriyi Redis'e yaz
+    const allUsers = await pool.query('SELECT id, email, name, role, createdAt, updatedAt FROM "User" ORDER BY "createdAt" DESC');
+    const usersData = allUsers.rows;
+    await redis.set('users', JSON.stringify(usersData), 'EX', 3600);
 
     return NextResponse.json(user);
   } catch (error) {

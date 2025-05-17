@@ -32,7 +32,27 @@ export async function POST(req: NextRequest) {
     [name, description]
   );
   const category = insertResult.rows[0];
-  // Cache'i temizle
-  await redis.del('categories');
+  // Kategoriler güncellendi, güncel veriyi Redis'e yaz
+  const allCategories = await pool.query('SELECT * FROM "Category" ORDER BY "createdAt" DESC');
+  const categoriesData = allCategories.rows;
+  await redis.set('categories', JSON.stringify(categoriesData), 'EX', 3600);
   return NextResponse.json(category, { status: 201 });
-} 
+}
+
+// Eğer bir DELETE fonksiyonu varsa, kategori silindikten sonra:
+// ... mevcut kod ...
+  // Kategoriler güncellendi, güncel veriyi Redis'e yaz
+  const allCategories = await pool.query('SELECT * FROM "Category" ORDER BY "createdAt" DESC');
+  const categoriesData = allCategories.rows;
+  await redis.set('categories', JSON.stringify(categoriesData), 'EX', 3600);
+// ... mevcut kod ... 
+
+// Eğer kategori silme (DELETE) fonksiyonu eklenirse, aşağıdaki gibi güncel cache yazılmalı:
+//
+// export async function DELETE(req: NextRequest) {
+//   // ... silme işlemi ...
+//   const allCategories = await pool.query('SELECT * FROM "Category" ORDER BY "createdAt" DESC');
+//   const categoriesData = allCategories.rows;
+//   await redis.set('categories', JSON.stringify(categoriesData), 'EX', 3600);
+//   return NextResponse.json({ success: true });
+// } 

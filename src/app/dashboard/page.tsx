@@ -37,6 +37,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [featuredTours, setFeaturedTours] = useState<Tour[]>([]);
   const [recentReservations, setRecentReservations] = useState<Reservation[]>([]);
+  const [reservationCount, setReservationCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -58,6 +59,13 @@ export default function Dashboard() {
         }
         const reservationsData = await reservationsResponse.json();
         setRecentReservations(reservationsData.slice(0, 3));
+
+        // Toplam rezervasyon sayısını getir
+        const statsResponse = await fetch('/api/admin/check-reservations');
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setReservationCount(statsData.reservationCount || 0);
+        }
       } catch (error) {
         setError('Veriler yüklenirken bir hata oluştu');
         console.error('Dashboard veri yükleme hatası:', error);
@@ -94,6 +102,12 @@ export default function Dashboard() {
           {error}
         </div>
       )}
+
+      {/* Toplam Rezervasyon Kartı */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-gray-800">Toplam Rezervasyon</h2>
+        <p className="text-3xl font-bold text-primary mt-2">{reservationCount}</p>
+      </div>
 
       {/* Öne Çıkan Turlar */}
       <div className="bg-white rounded-lg shadow p-6">

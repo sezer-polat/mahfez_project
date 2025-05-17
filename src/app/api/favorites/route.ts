@@ -86,8 +86,29 @@ export async function POST(request: Request) {
     );
     const favorite = insertResult.rows[0];
 
-    // Cache'i temizle
-    await redis.del('favorites');
+    // Favoriler güncellendi, güncel veriyi Redis'e yaz
+    const allFavorites = await pool.query(`
+      SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t."startDate" as tour_startDate, t."endDate" as tour_endDate, c.name as category_name
+      FROM "Favorite" f
+      LEFT JOIN "Tour" t ON f."tourId" = t.id
+      LEFT JOIN "Category" c ON t."categoryId" = c.id
+      ORDER BY f."createdAt" DESC
+    `);
+    let data = allFavorites.rows
+      .filter(row => row.tour_title)
+      .map(row => ({
+        ...row,
+        tour: {
+          id: row.tourId,
+          title: row.tour_title,
+          image: row.tour_image || '/images/default-tour.jpg',
+          price: row.tour_price,
+          startDate: row.tour_startDate,
+          endDate: row.tour_endDate,
+          category: row.category_name ? { name: row.category_name } : null,
+        },
+      }));
+    await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
 
     return NextResponse.json(favorite);
   } catch (error) {
@@ -114,8 +135,29 @@ export async function DELETE(request: Request) {
       [userId, tourId]
     );
 
-    // Cache'i temizle
-    await redis.del('favorites');
+    // Favoriler güncellendi, güncel veriyi Redis'e yaz
+    const allFavorites = await pool.query(`
+      SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t."startDate" as tour_startDate, t."endDate" as tour_endDate, c.name as category_name
+      FROM "Favorite" f
+      LEFT JOIN "Tour" t ON f."tourId" = t.id
+      LEFT JOIN "Category" c ON t."categoryId" = c.id
+      ORDER BY f."createdAt" DESC
+    `);
+    let data = allFavorites.rows
+      .filter(row => row.tour_title)
+      .map(row => ({
+        ...row,
+        tour: {
+          id: row.tourId,
+          title: row.tour_title,
+          image: row.tour_image || '/images/default-tour.jpg',
+          price: row.tour_price,
+          startDate: row.tour_startDate,
+          endDate: row.tour_endDate,
+          category: row.category_name ? { name: row.category_name } : null,
+        },
+      }));
+    await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
 
     if (deleteResult.rowCount === 0) {
       return NextResponse.json({ error: 'Favori bulunamadı' }, { status: 404 });
