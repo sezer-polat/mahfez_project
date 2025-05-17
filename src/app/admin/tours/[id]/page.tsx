@@ -364,7 +364,6 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
                     name="available"
                     required
                     min="0"
-                    max={formData.capacity}
                     value={formData.available}
                     onChange={(e) => setFormData({ ...formData, available: e.target.value })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
