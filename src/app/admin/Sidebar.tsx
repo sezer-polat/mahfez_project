@@ -60,8 +60,8 @@ export default function Sidebar() {
             Kategoriler
           </Link>
           <Link
-            href="/admin/bookings"
-            className={`flex items-center px-4 py-2 rounded-lg ${isActive('/admin/bookings')}`}
+            href="/admin/reservations"
+            className={`flex items-center px-4 py-2 rounded-lg ${isActive('/admin/reservations')}`}
           >
             <i className="ri-calendar-check-line mr-3"></i>
             Rezervasyonlar

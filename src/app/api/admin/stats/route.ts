@@ -65,7 +65,7 @@ export async function GET() {
     });
 
     // Son rezervasyonlar
-    const recentBookings = await prisma.reservation.findMany({
+    const recentReservations = await prisma.reservation.findMany({
       take: 5,
       orderBy: {
         createdAt: 'desc'
@@ -98,7 +98,7 @@ export async function GET() {
       cancelledReservations,
       totalRevenue: totalRevenue._sum.totalPrice || 0,
       lastWeekReservations,
-      recentBookings
+      recentReservations
     });
   } catch (error) {
     console.error('Stats API: Detaylı hata bilgisi:', {
