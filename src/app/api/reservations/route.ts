@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import redis from '@/lib/redis';
@@ -156,4 +156,29 @@ export async function GET() {
   await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
 
   return NextResponse.json(data);
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
+    const { status } = await request.json();
+    if (!id || !status) {
+      return NextResponse.json({ error: 'Eksik parametre' }, { status: 400 });
+    }
+    // Sadece status güncelle
+    const result = await pool.query(
+      'UPDATE "Reservation" SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'Rezervasyon bulunamadı' }, { status: 404 });
+    }
+    // Cache'i temizle
+    await redis.del('reservations');
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
+    console.error('Rezervasyon güncelleme hatası:', error);
+    return NextResponse.json({ error: 'Rezervasyon güncellenemedi', details: error instanceof Error ? error.message : String(error) }, { status: 500 });
+  }
 } 

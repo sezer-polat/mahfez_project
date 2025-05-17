@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     // Favorilerle birlikte ilgili turun ve kategorisinin adını çek
     const result = await pool.query(`
-      SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t.startDate as tour_startDate, t.endDate as tour_endDate, c.name as category_name
+      SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t."startDate" as tour_startDate, t."endDate" as tour_endDate, c.name as category_name
       FROM "Favorite" f
       LEFT JOIN "Tour" t ON f."tourId" = t.id
       LEFT JOIN "Category" c ON t."categoryId" = c.id
