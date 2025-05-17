@@ -10,37 +10,45 @@ export const dynamic = 'force-dynamic';
 
 // GET: Tüm favorileri getir
 export async function GET() {
-  let data: any = await redis.get('favorites');
-  if (data) {
-    return NextResponse.json(JSON.parse(data));
+  try {
+    let data: any = await redis.get('favorites');
+    if (data) {
+      return NextResponse.json(JSON.parse(data));
+    }
+
+    // Favorilerle birlikte ilgili turun ve kategorisinin adını çek
+    const result = await pool.query(`
+      SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t.startDate as tour_startDate, t.endDate as tour_endDate, c.name as category_name
+      FROM "Favorite" f
+      LEFT JOIN "Tour" t ON f."tourId" = t.id
+      LEFT JOIN "Category" c ON t."categoryId" = c.id
+      ORDER BY f."createdAt" DESC
+    `);
+    data = result.rows
+      .filter(row => row.tour_title) // Sadece başlık zorunlu
+      .map(row => ({
+        ...row,
+        tour: {
+          id: row.tourId,
+          title: row.tour_title,
+          image: row.tour_image || '/images/default-tour.jpg',
+          price: row.tour_price,
+          startDate: row.tour_startDate,
+          endDate: row.tour_endDate,
+          category: row.category_name ? { name: row.category_name } : null,
+        },
+      }));
+
+    await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Favoriler GET hatası:', error);
+    return NextResponse.json(
+      { error: 'Favoriler yüklenirken bir hata oluştu', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
-
-  // Favorilerle birlikte ilgili turun ve kategorisinin adını çek
-  const result = await pool.query(`
-    SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t.startDate as tour_startDate, t.endDate as tour_endDate, c.name as category_name
-    FROM "Favorite" f
-    LEFT JOIN "Tour" t ON f."tourId" = t.id
-    LEFT JOIN "Category" c ON t."categoryId" = c.id
-    ORDER BY f."createdAt" DESC
-  `);
-  data = result.rows
-    .filter(row => row.tour_title && row.tour_image && row.tour_startDate && row.tour_endDate)
-    .map(row => ({
-      ...row,
-      tour: {
-        id: row.tourId,
-        title: row.tour_title,
-        image: row.tour_image,
-        price: row.tour_price,
-        startDate: row.tour_startDate,
-        endDate: row.tour_endDate,
-        category: row.category_name ? { name: row.category_name } : null,
-      },
-    }));
-
-  await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
-
-  return NextResponse.json(data);
 }
 
 // POST: Yeni favori ekle
