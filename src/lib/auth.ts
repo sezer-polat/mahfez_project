@@ -5,6 +5,28 @@ import { compare, hash } from 'bcryptjs';
 
 type UserRole = "USER" | "ADMIN";
 
+declare module "next-auth" {
+  interface User {
+    id: string;
+    role: UserRole;
+    email: string;
+    name: string;
+  }
+
+  interface Session {
+    user: User;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    role: UserRole;
+    email: string;
+    name: string;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -32,6 +54,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Geçersiz şifre");
         }
 
+        if (user.role !== 'ADMIN') {
+          throw new Error("Bu sayfaya erişim yetkiniz yok");
+        }
+
         return {
           id: String(user.id),
           email: user.email,
@@ -50,29 +76,25 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        return {
-          ...token,
-          id: user.id,
-          role: user.role,
-          email: user.email,
-          name: user.name,
-        };
+        token.id = user.id;
+        token.role = user.role;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id as string,
-          role: token.role as UserRole,
-          email: token.email as string,
-          name: token.name as string,
-        },
-      };
+      if (token) {
+        session.user = {
+          id: token.id,
+          role: token.role,
+          email: token.email,
+          name: token.name,
+        };
+      }
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
