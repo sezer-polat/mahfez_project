@@ -23,18 +23,20 @@ export async function GET() {
     LEFT JOIN "Category" c ON t."categoryId" = c.id
     ORDER BY f."createdAt" DESC
   `);
-  data = result.rows.map(row => ({
-    ...row,
-    tour: {
-      id: row.tourId,
-      title: row.tour_title,
-      image: row.tour_image,
-      price: row.tour_price,
-      startDate: row.tour_startDate,
-      endDate: row.tour_endDate,
-      category: row.category_name ? { name: row.category_name } : null,
-    },
-  }));
+  data = result.rows
+    .filter(row => row.tour_title && row.tour_image && row.tour_startDate && row.tour_endDate)
+    .map(row => ({
+      ...row,
+      tour: {
+        id: row.tourId,
+        title: row.tour_title,
+        image: row.tour_image,
+        price: row.tour_price,
+        startDate: row.tour_startDate,
+        endDate: row.tour_endDate,
+        category: row.category_name ? { name: row.category_name } : null,
+      },
+    }));
 
   await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
 
@@ -51,7 +53,7 @@ export async function POST(request: Request) {
     const id = cuid();
 
     // Aynı favori var mı kontrol et
-    const existing = await pool.query('SELECT id FROM "Favorite" WHERE userId = $1 AND tourId = $2', [userId, tourId]);
+    const existing = await pool.query('SELECT "id" FROM "Favorite" WHERE "userId" = $1 AND "tourId" = $2', [userId, tourId]);
     if (existing.rows.length > 0) {
       return NextResponse.json(
         { error: 'Bu tur zaten favorilerde' },
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     const insertResult = await pool.query(
-      'INSERT INTO "Favorite" (id, userId, tourId, createdAt, updatedAt) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO "Favorite" ("id", "userId", "tourId", "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [id, userId, tourId, now, now]
     );
     const favorite = insertResult.rows[0];
@@ -89,7 +91,7 @@ export async function DELETE(request: Request) {
     }
 
     const deleteResult = await pool.query(
-      'DELETE FROM "Favorite" WHERE userId = $1 AND tourId = $2 RETURNING *',
+      'DELETE FROM "Favorite" WHERE "userId" = $1 AND "tourId" = $2 RETURNING *',
       [userId, tourId]
     );
 

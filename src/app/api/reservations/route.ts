@@ -113,8 +113,22 @@ export async function GET() {
     return NextResponse.json(JSON.parse(data));
   }
 
-  const result = await pool.query('SELECT * FROM "Reservation" ORDER BY "createdAt" DESC');
-  data = result.rows;
+  // Rezervasyonları tur bilgisiyle birlikte çek
+  const result = await pool.query(`
+    SELECT r.*, t.title as tour_title, t.image as tour_image, t.startDate as tour_startDate, t.endDate as tour_endDate
+    FROM "Reservation" r
+    LEFT JOIN "Tour" t ON r."tourId" = t.id
+    ORDER BY r."createdAt" DESC
+  `);
+  data = result.rows.map(row => ({
+    ...row,
+    tour: {
+      title: row.tour_title,
+      image: row.tour_image,
+      startDate: row.tour_startDate,
+      endDate: row.tour_endDate,
+    }
+  }));
 
   await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
 
