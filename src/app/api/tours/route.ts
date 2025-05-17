@@ -1,33 +1,26 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { corsHeaders } from '@/lib/cors';
+import redis from '@/lib/redis';
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
 
 // GET: Tüm turları getir
 export async function GET() {
-  try {
-    const tours = await prisma.tour.findMany({
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        image: true,
-        startDate: true,
-        endDate: true,
-        isActive: true,
-        category: { select: { name: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json(tours, { headers: corsHeaders });
-  } catch (error) {
-    console.error('Error fetching tours:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500, headers: corsHeaders }
-    );
+  let data: any = await redis.get('tours');
+  if (data) {
+    return NextResponse.json(JSON.parse(data));
   }
+
+  const result = await pool.query('SELECT * FROM "Tour" ORDER BY "createdAt" DESC');
+  data = result.rows;
+
+  await redis.set('tours', JSON.stringify(data), 'EX', 3600);
+
+  return NextResponse.json(data);
 }
 
 // POST: Yeni tur oluştur

@@ -1,121 +1,56 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import redis from '@/lib/redis';
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
 
+// GET: Tüm favorileri getir
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    console.log('Session:', session); // Debug için
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const favorites = await prisma.favorite.findMany({
-      where: { userId: user.id },
-      select: {
-        tour: {
-          select: {
-            id: true,
-            title: true,
-            image: true,
-            price: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return NextResponse.json(favorites);
-  } catch (error) {
-    console.error('Error fetching favorites:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  let data: any = await redis.get('favorites');
+  if (data) {
+    return NextResponse.json(JSON.parse(data));
   }
+
+  const result = await pool.query('SELECT * FROM "Favorite" ORDER BY "createdAt" DESC');
+  data = result.rows;
+
+  await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
+
+  return NextResponse.json(data);
 }
 
+// POST: Yeni favori ekle
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    console.log('Session:', session); // Debug için
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { tourId } = body;
+    const { userId, tourId } = body;
 
-    if (!tourId) {
-      return NextResponse.json({ error: 'Tour ID is required' }, { status: 400 });
+    // Aynı favori var mı kontrol et
+    const existing = await pool.query('SELECT id FROM "Favorite" WHERE userId = $1 AND tourId = $2', [userId, tourId]);
+    if (existing.rows.length > 0) {
+      return NextResponse.json(
+        { error: 'Bu tur zaten favorilerde' },
+        { status: 400 }
+      );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
+    const insertResult = await pool.query(
+      'INSERT INTO "Favorite" (userId, tourId) VALUES ($1, $2) RETURNING *',
+      [userId, tourId]
+    );
+    const favorite = insertResult.rows[0];
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Önce favori var mı kontrol et
-    const existingFavorite = await prisma.favorite.findUnique({
-      where: {
-        userId_tourId: {
-          userId: user.id,
-          tourId: tourId,
-        },
-      },
-    });
-
-    if (existingFavorite) {
-      return NextResponse.json({ error: 'Favorite already exists' }, { status: 400 });
-    }
-
-    const tour = await prisma.tour.findUnique({
-      where: { id: tourId },
-    });
-
-    if (!tour) {
-      return NextResponse.json({ error: 'Tour not found' }, { status: 404 });
-    }
-
-    const favorite = await prisma.favorite.create({
-      data: {
-        userId: user.id,
-        tourId: tour.id,
-      },
-      include: {
-        tour: {
-          select: {
-            id: true,
-            title: true,
-            image: true,
-            price: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
-      },
-    });
+    // Cache'i temizle
+    await redis.del('favorites');
 
     return NextResponse.json(favorite);
   } catch (error) {
-    console.error('Error creating favorite:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Favori eklenirken bir hata oluştu' },
+      { status: 500 }
+    );
   }
 }
 

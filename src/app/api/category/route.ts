@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import redis from '@/lib/redis';
+import { Pool } from 'pg';
 
 const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
 
 // Kategorileri listele ve yeni kategori ekle
 export async function GET() {
-  const categories = await prisma.category.findMany({
-    select: { id: true, name: true, description: true }
-  });
-  return NextResponse.json(categories);
+  let data: any = await redis.get('categories');
+  if (data) {
+    return NextResponse.json(JSON.parse(data));
+  }
+
+  const result = await pool.query('SELECT * FROM "Category" ORDER BY "createdAt" DESC');
+  data = result.rows;
+
+  await redis.set('categories', JSON.stringify(data), 'EX', 3600);
+
+  return NextResponse.json(data);
 }
 
 export async function POST(req: NextRequest) {

@@ -1,66 +1,26 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import redis from '@/lib/redis';
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/bookings - Kullanıcının rezervasyonlarını getir
-export async function GET(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 10;
-    const skip = (page - 1) * limit;
-
-    const bookings = await prisma.booking.findMany({
-      where: {
-        userId: session.user.id
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        numberOfPeople: true,
-        totalPrice: true,
-        status: true,
-        createdAt: true,
-        tour: {
-          select: {
-            title: true,
-            image: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
-      },
-    });
-
-    const total = await prisma.booking.count({
-      where: {
-        userId: session.user.id
-      }
-    });
-
-    return NextResponse.json({
-      bookings,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit)
-    });
-  } catch (error) {
-    console.error('Error fetching bookings:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+export async function GET() {
+  let data: any = await redis.get('bookings');
+  if (data) {
+    return NextResponse.json(JSON.parse(data));
   }
+
+  const result = await pool.query('SELECT * FROM "Booking" ORDER BY "createdAt" DESC');
+  data = result.rows;
+
+  await redis.set('bookings', JSON.stringify(data), 'EX', 3600);
+
+  return NextResponse.json(data);
 }
 
 // POST /api/bookings - Yeni rezervasyon oluştur
@@ -76,9 +36,8 @@ export async function POST(req: Request) {
     const { tourId, numberOfPeople, notes } = body;
 
     // Tur bilgilerini al
-    const tour = await prisma.tour.findUnique({
-      where: { id: tourId }
-    });
+    const tourResult = await pool.query('SELECT * FROM "Tour" WHERE id = $1', [tourId]);
+    const tour = tourResult.rows[0];
 
     if (!tour) {
       return new NextResponse('Tur bulunamadı', { status: 404 });
@@ -89,34 +48,27 @@ export async function POST(req: Request) {
       return new NextResponse('Yetersiz kapasite', { status: 400 });
     }
 
-    // Booking oluştur
-    const booking = await prisma.$transaction(async (tx) => {
+    // Transaction başlat
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
       // Tur kapasitesini güncelle
-      const updatedTour = await tx.tour.update({
-        where: { id: tourId },
-        data: {
-          available: {
-            decrement: numberOfPeople
-          }
-        }
-      });
-
+      await client.query('UPDATE "Tour" SET available = available - $1 WHERE id = $2', [numberOfPeople, tourId]);
       // Booking oluştur
-      const newBooking = await tx.booking.create({
-        data: {
-          userId: session.user.id,
-          tourId,
-          numberOfPeople,
-          totalPrice: tour.price * numberOfPeople,
-          notes,
-          status: 'PENDING'
-        }
-      });
-
-      return newBooking;
-    });
-
-    return NextResponse.json(booking);
+      const bookingResult = await client.query(
+        'INSERT INTO "Booking" (userId, tourId, numberOfPeople, totalPrice, notes, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [session.user.id, tourId, numberOfPeople, tour.price * numberOfPeople, notes, 'PENDING']
+      );
+      await client.query('COMMIT');
+      // Cache'i temizle
+      await redis.del('bookings');
+      return NextResponse.json(bookingResult.rows[0]);
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (error) {
     console.error('Booking error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });

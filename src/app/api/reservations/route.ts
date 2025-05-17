@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import redis from '@/lib/redis';
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +25,8 @@ export async function POST(request: Request) {
     } = body;
 
     // Turu kontrol et
-    const tour = await prisma.tour.findUnique({
-      where: { id: tourId },
-    });
+    const tourResult = await pool.query('SELECT * FROM "Tour" WHERE id = $1', [tourId]);
+    const tour = tourResult.rows[0];
 
     if (!tour) {
       return NextResponse.json(
@@ -41,33 +43,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Rezervasyonu oluştur
-    const reservation = await prisma.reservation.create({
-      data: {
-        tourId,
-        firstName,
-        lastName,
-        email,
-        phone,
-        address,
-        city,
-        country,
-        specialRequests,
-        numberOfPeople,
-        status: 'PENDING',
-        totalPrice: tour.price * numberOfPeople,
-      },
-    });
-
-    // Tur kontenjanını güncelle
-    await prisma.tour.update({
-      where: { id: tourId },
-      data: {
-        available: tour.available - numberOfPeople,
-      },
-    });
-
-    return NextResponse.json(reservation);
+    // Transaction başlat
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Rezervasyonu oluştur
+      const reservationResult = await client.query(
+        'INSERT INTO "Reservation" (tourId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, status, totalPrice) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',
+        [tourId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople]
+      );
+      // Tur kontenjanını güncelle
+      await client.query('UPDATE "Tour" SET available = available - $1 WHERE id = $2', [numberOfPeople, tourId]);
+      await client.query('COMMIT');
+      // Cache'i temizle
+      await redis.del('reservations');
+      return NextResponse.json(reservationResult.rows[0]);
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (error) {
     console.error('Rezervasyon oluşturma hatası:', error);
     return NextResponse.json(
@@ -78,46 +74,15 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    console.log('Fetching reservations for user:', session.user.email); // Debug log
-
-    const reservations = await prisma.reservation.findMany({
-      where: {
-        email: session.user.email
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        numberOfPeople: true,
-        totalPrice: true,
-        status: true,
-        createdAt: true,
-        tour: {
-          select: {
-            title: true,
-            image: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
-      },
-    });
-
-    console.log('Found reservations:', reservations); // Debug log
-
-    return NextResponse.json(reservations);
-  } catch (error) {
-    console.error('Error fetching reservations:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+  let data: any = await redis.get('reservations');
+  if (data) {
+    return NextResponse.json(JSON.parse(data));
   }
+
+  const result = await pool.query('SELECT * FROM "Reservation" ORDER BY "createdAt" DESC');
+  data = result.rows;
+
+  await redis.set('reservations', JSON.stringify(data), 'EX', 3600);
+
+  return NextResponse.json(data);
 } 
