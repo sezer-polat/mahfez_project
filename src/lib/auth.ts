@@ -36,7 +36,6 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Geçersiz şifre");
           }
 
-          console.log('User authenticated successfully:', { userId: user.id, email: user.email });
           return {
             id: String(user.id),
             email: user.email,
@@ -64,7 +63,6 @@ export const authOptions: NextAuthOptions = {
         if (user) {
           token.id = user.id;
           token.role = user.role as UserRole;
-          console.log('JWT token updated:', { userId: user.id, role: user.role });
         }
         return token;
       } catch (error) {
@@ -77,7 +75,6 @@ export const authOptions: NextAuthOptions = {
         if (session.user) {
           session.user.id = token.id as string;
           session.user.role = token.role as UserRole;
-          console.log('Session updated:', { userId: session.user.id, role: session.user.role });
         }
         return session;
       } catch (error) {
