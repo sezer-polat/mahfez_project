@@ -60,6 +60,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/admin',
+        destination: '/admin/dashboard',
+        permanent: true,
+      },
+      {
         source: '/admin/turlar',
         destination: '/admin/tours',
         permanent: true,
