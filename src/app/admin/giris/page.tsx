@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession, SessionProvider } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-export default function AdminLogin() {
+function LoginForm() {
   const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +16,7 @@ export default function AdminLogin() {
     if (status === 'loading') return;
     
     if (session?.user?.role === 'ADMIN') {
-      console.log('Session in useEffect:', session); // Debug için
-      router.replace('/admin');
+      router.replace('/admin/dashboard');
     }
   }, [session, status, router]);
 
@@ -39,8 +38,7 @@ export default function AdminLogin() {
       }
 
       if (result?.ok) {
-        console.log('Sign in successful, session:', await useSession()); // Debug için
-        router.push('/admin');
+        router.push('/admin/dashboard');
         router.refresh();
       }
     } catch (error) {
@@ -113,5 +111,13 @@ export default function AdminLogin() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <SessionProvider>
+      <LoginForm />
+    </SessionProvider>
   );
 } 
