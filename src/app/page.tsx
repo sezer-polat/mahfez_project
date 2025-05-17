@@ -38,13 +38,12 @@ export default function Home() {
   useEffect(() => {
     const fetchFeaturedTours = async () => {
       try {
-        const res = await fetch('/api/tours');
+        const res = await fetch('/api/tours/featured');
         if (!res.ok) {
           throw new Error('Turlar yüklenirken bir hata oluştu');
         }
         const data = await res.json();
-        // İlk 3 turu al
-        setFeaturedTours(data.slice(0, 3));
+        setFeaturedTours(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Bir hata oluştu');
       } finally {
@@ -152,13 +151,13 @@ export default function Home() {
                   <div className="card-content">
                     <ul className="space-y-2 text-gray-600">
                       <li>✓ {tour.duration} Gün</li>
-                      <li>✓ {tour.category.name}</li>
-                      <li>✓ ₺{tour.price.toLocaleString('tr-TR')}</li>
+                      <li>✓ {tour.category?.name || 'Kategori Yok'}</li>
+                      <li>✓ ₺{tour.price?.toLocaleString('tr-TR') || tour.price}</li>
                     </ul>
                   </div>
                   <div className="card-footer">
                     <button
-                      onClick={() => handleTourClick(tour.category.name)}
+                      onClick={() => handleTourClick(tour.category?.name || '')}
                       className="btn btn-primary w-full"
                     >
                       Detaylı Bilgi
