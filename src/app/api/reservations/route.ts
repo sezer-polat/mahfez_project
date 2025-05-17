@@ -21,16 +21,33 @@ export async function POST(request: Request) {
       city,
       country,
       specialRequests,
-      numberOfPeople,
+      numberOfPeople: rawNumberOfPeople,
     } = body;
 
+    // numberOfPeople'ı number'a çevir
+    const numberOfPeople = Number(rawNumberOfPeople);
+
     // Eksik alan kontrolü
-    if (!tourId || !firstName || !lastName || !email || !phone || !address || !city || !country || !numberOfPeople) {
+    if (
+      !tourId ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !address ||
+      !city ||
+      !country ||
+      isNaN(numberOfPeople) ||
+      numberOfPeople < 1
+    ) {
       return NextResponse.json(
-        { error: 'Tüm alanları doldurmalısınız.' },
+        { error: 'Tüm alanları eksiksiz ve doğru doldurmalısınız.' },
         { status: 400 }
       );
     }
+
+    // Gelen veriyi logla
+    console.log('Rezervasyon body:', body);
 
     // Turu kontrol et
     const tourResult = await pool.query('SELECT * FROM "Tour" WHERE id = $1', [tourId]);
@@ -73,11 +90,19 @@ export async function POST(request: Request) {
       client.release();
     }
   } catch (error) {
-    console.error('Rezervasyon oluşturma hatası:', error);
-    return NextResponse.json(
-      { error: 'Rezervasyon oluşturulamadı' },
-      { status: 500 }
-    );
+    if (error instanceof Error) {
+      console.error('Rezervasyon oluşturma hatası:', error, error.stack);
+      return NextResponse.json(
+        { error: 'Rezervasyon oluşturulamadı', details: error.message },
+        { status: 500 }
+      );
+    } else {
+      console.error('Rezervasyon oluşturma hatası:', error);
+      return NextResponse.json(
+        { error: 'Rezervasyon oluşturulamadı', details: String(error) },
+        { status: 500 }
+      );
+    }
   }
 }
 
