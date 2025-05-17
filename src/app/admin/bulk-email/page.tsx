@@ -118,22 +118,6 @@ export default function BulkEmailPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-gray-900">Filtreler</h3>
 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="hasBookings"
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    checked={formData.filters.hasBookings}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      filters: { ...formData.filters, hasBookings: e.target.checked }
-                    })}
-                  />
-                  <label htmlFor="hasBookings" className="ml-2 block text-sm text-gray-900">
-                    Sadece rezervasyon yapmış kullanıcılar
-                  </label>
-                </div>
-
                 <div>
                   <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                     Kullanıcı Rolü

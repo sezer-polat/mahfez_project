@@ -20,7 +20,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
-  bookings      Booking[]
+  reservations  Reservation[]
   posts         Post[]
   sessions      Session[]
   favorites     Favorite[]
@@ -169,6 +169,7 @@ model TourImage {
 model Reservation {
   id              String   @id @default(cuid())
   tourId          String
+  userId          String
   firstName       String
   lastName        String
   email           String
@@ -183,6 +184,7 @@ model Reservation {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tour            Tour     @relation("TourReservations", fields: [tourId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Favorite {

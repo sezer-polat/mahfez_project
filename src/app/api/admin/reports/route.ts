@@ -31,8 +31,8 @@ export async function GET(req: Request) {
 
     let data;
     switch (reportType) {
-      case 'bookings':
-        data = await prisma.booking.findMany({
+      case 'reservations':
+        data = await prisma.reservation.findMany({
           where: {
             createdAt: {
               gte: start,
@@ -40,8 +40,7 @@ export async function GET(req: Request) {
             }
           },
           include: {
-            tour: true,
-            user: true
+            tour: true
           }
         });
         break;
@@ -55,14 +54,14 @@ export async function GET(req: Request) {
           },
           include: {
             category: true,
-            bookings: true
+            reservations: true
           }
         });
         break;
       case 'financial':
-        data = await prisma.booking.findMany({
+        data = await prisma.reservation.findMany({
           where: {
-            status: Status.CONFIRMED,
+            status: 'CONFIRMED',
             createdAt: {
               gte: start,
               lte: end
@@ -83,22 +82,22 @@ export async function GET(req: Request) {
 
       // Excel başlıklarını ve verilerini ayarla
       switch (reportType) {
-        case 'bookings':
+        case 'reservations':
           worksheet.columns = [
             { header: 'Rezervasyon ID', key: 'id' },
             { header: 'Tur ID', key: 'tourId' },
-            { header: 'Kullanıcı ID', key: 'userId' },
+            { header: 'Ad Soyad', key: 'name' },
             { header: 'Durum', key: 'status' },
             { header: 'Toplam Tutar', key: 'amount' },
             { header: 'Tarih', key: 'date' }
           ];
-          worksheet.addRows(data.map((booking: any) => ({
-            id: booking.id,
-            tourId: booking.tourId,
-            userId: booking.userId,
-            status: booking.status,
-            amount: booking.totalPrice,
-            date: new Date(booking.createdAt).toLocaleDateString('tr-TR')
+          worksheet.addRows(data.map((reservation: any) => ({
+            id: reservation.id,
+            tourId: reservation.tourId,
+            name: reservation.firstName + ' ' + reservation.lastName,
+            status: reservation.status,
+            amount: reservation.totalPrice,
+            date: new Date(reservation.createdAt).toLocaleDateString('tr-TR')
           })));
           break;
         case 'tours':
@@ -123,10 +122,10 @@ export async function GET(req: Request) {
             { header: 'Tur ID', key: 'tourId' },
             { header: 'Tutar', key: 'amount' }
           ];
-          worksheet.addRows(data.map((booking: any) => ({
-            date: new Date(booking.createdAt).toLocaleDateString('tr-TR'),
-            tourId: booking.tourId,
-            amount: booking.totalPrice
+          worksheet.addRows(data.map((reservation: any) => ({
+            date: new Date(reservation.createdAt).toLocaleDateString('tr-TR'),
+            tourId: reservation.tourId,
+            amount: reservation.totalPrice
           })));
           break;
       }
@@ -153,14 +152,14 @@ export async function GET(req: Request) {
 
       // PDF içeriğini oluştur
       switch (reportType) {
-        case 'bookings':
-          data.forEach((booking: any) => {
-            doc.fontSize(12).text(`Rezervasyon ID: ${booking.id}`);
-            doc.fontSize(10).text(`Tur ID: ${booking.tourId}`);
-            doc.text(`Kullanıcı ID: ${booking.userId}`);
-            doc.text(`Durum: ${booking.status}`);
-            doc.text(`Toplam Tutar: ₺${booking.totalPrice}`);
-            doc.text(`Tarih: ${new Date(booking.createdAt).toLocaleDateString('tr-TR')}`);
+        case 'reservations':
+          data.forEach((reservation: any) => {
+            doc.fontSize(12).text(`Rezervasyon ID: ${reservation.id}`);
+            doc.fontSize(10).text(`Tur ID: ${reservation.tourId}`);
+            doc.text(`Ad Soyad: ${reservation.firstName} ${reservation.lastName}`);
+            doc.text(`Durum: ${reservation.status}`);
+            doc.text(`Toplam Tutar: ₺${reservation.totalPrice}`);
+            doc.text(`Tarih: ${new Date(reservation.createdAt).toLocaleDateString('tr-TR')}`);
             doc.moveDown();
           });
           break;
@@ -175,10 +174,10 @@ export async function GET(req: Request) {
           });
           break;
         case 'financial':
-          data.forEach((booking: any) => {
-            doc.fontSize(12).text(`Tarih: ${new Date(booking.createdAt).toLocaleDateString('tr-TR')}`);
-            doc.fontSize(10).text(`Tur ID: ${booking.tourId}`);
-            doc.text(`Tutar: ₺${booking.totalPrice}`);
+          data.forEach((reservation: any) => {
+            doc.fontSize(12).text(`Tarih: ${new Date(reservation.createdAt).toLocaleDateString('tr-TR')}`);
+            doc.fontSize(10).text(`Tur ID: ${reservation.tourId}`);
+            doc.text(`Tutar: ₺${reservation.totalPrice}`);
             doc.moveDown();
           });
           break;
