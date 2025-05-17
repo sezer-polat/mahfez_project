@@ -398,49 +398,51 @@ export default function ProfilePage() {
                   ) : (
                     <div className="space-y-4">
                       {reservations.map((reservation) => (
-                        <div key={reservation.id} className="border rounded-lg p-4">
-                          <div className="flex items-start space-x-4">
-                            <div className="relative h-24 w-24 flex-shrink-0">
-                              <Image
-                                src={reservation.tour?.image || '/images/default-tour.jpg'}
-                                alt={reservation.tour?.title || 'Tur'}
-                                fill
-                                className="object-cover rounded-lg"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold">{reservation.tour.title}</h3>
-                              <p className="text-sm text-gray-500">
-                                {new Date(reservation.tour.startDate).toLocaleDateString('tr-TR')} -{' '}
-                                {new Date(reservation.tour.endDate).toLocaleDateString('tr-TR')}
-                              </p>
-                              <div className="mt-2 flex items-center justify-between">
-                                <div>
-                                  <p className="text-sm">
-                                    <span className="font-medium">Kişi Sayısı:</span> {reservation.numberOfPeople}
-                                  </p>
-                                  <p className="text-sm">
-                                    <span className="font-medium">Toplam Tutar:</span>{' '}
-                                    {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(reservation.totalPrice)}
-                                  </p>
-                                </div>
-                                <div className="flex flex-col items-end space-y-2">
-                                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
-                                    {getStatusText(reservation.status)}
-                                  </span>
-                                  {reservation.status === 'CONFIRMED' && (
-                                    <button
-                                      onClick={() => handleCancelReservation(reservation.id)}
-                                      className="text-sm text-red-600 hover:text-red-800"
-                                    >
-                                      İptal Et
-                                    </button>
-                                  )}
+                        reservation.tour ? (
+                          <div key={reservation.id} className="border rounded-lg p-4">
+                            <div className="flex items-start space-x-4">
+                              <div className="relative h-24 w-24 flex-shrink-0">
+                                <Image
+                                  src={reservation.tour.image || '/images/default-tour.jpg'}
+                                  alt={reservation.tour.title || 'Tur'}
+                                  fill
+                                  className="object-cover rounded-lg"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold">{reservation.tour.title || 'Tur Bilgisi Yok'}</h3>
+                                <p className="text-sm text-gray-500">
+                                  {reservation.tour.startDate ? new Date(reservation.tour.startDate).toLocaleDateString('tr-TR') : ''} -{' '}
+                                  {reservation.tour.endDate ? new Date(reservation.tour.endDate).toLocaleDateString('tr-TR') : ''}
+                                </p>
+                                <div className="mt-2 flex items-center justify-between">
+                                  <div>
+                                    <p className="text-sm">
+                                      <span className="font-medium">Kişi Sayısı:</span> {reservation.numberOfPeople}
+                                    </p>
+                                    <p className="text-sm">
+                                      <span className="font-medium">Toplam Tutar:</span>{' '}
+                                      {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(reservation.totalPrice)}
+                                    </p>
+                                  </div>
+                                  <div className="flex flex-col items-end space-y-2">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reservation.status)}`}>
+                                      {getStatusText(reservation.status)}
+                                    </span>
+                                    {reservation.status === 'CONFIRMED' && (
+                                      <button
+                                        onClick={() => handleCancelReservation(reservation.id)}
+                                        className="text-sm text-red-600 hover:text-red-800"
+                                      >
+                                        İptal Et
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        ) : null
                       ))}
                     </div>
                   )}
@@ -455,42 +457,44 @@ export default function ProfilePage() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {favorites.map((favorite) => (
-                        <div key={favorite.id} className="border rounded-lg overflow-hidden">
-                          <div className="relative h-48">
-                            <Image
-                              src={favorite.tour?.image || '/images/default-tour.jpg'}
-                              alt={favorite.tour?.title || 'Tur'}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="p-4">
-                            <h3 className="font-semibold mb-2">{favorite.tour.title}</h3>
-                            <p className="text-sm text-gray-500 mb-2">
-                              {new Date(favorite.tour.startDate).toLocaleDateString('tr-TR')} -{' '}
-                              {new Date(favorite.tour.endDate).toLocaleDateString('tr-TR')}
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <p className="font-medium">
-                                {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(favorite.tour.price)}
+                        favorite.tour ? (
+                          <div key={favorite.id} className="border rounded-lg overflow-hidden">
+                            <div className="relative h-48">
+                              <Image
+                                src={favorite.tour.image || '/images/default-tour.jpg'}
+                                alt={favorite.tour.title || 'Tur'}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="p-4">
+                              <h3 className="font-semibold mb-2">{favorite.tour.title || 'Tur Bilgisi Yok'}</h3>
+                              <p className="text-sm text-gray-500 mb-2">
+                                {favorite.tour.startDate ? new Date(favorite.tour.startDate).toLocaleDateString('tr-TR') : ''} -{' '}
+                                {favorite.tour.endDate ? new Date(favorite.tour.endDate).toLocaleDateString('tr-TR') : ''}
                               </p>
-                              <div className="space-x-2">
-                                <Link
-                                  href={`/tours/${favorite.tour.id}`}
-                                  className="text-primary hover:text-primary-dark"
-                                >
-                                  Detaylar
-                                </Link>
-                                <button
-                                  onClick={() => handleRemoveFavorite(favorite.tour.id)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  Kaldır
-                                </button>
+                              <div className="flex items-center justify-between">
+                                <p className="font-medium">
+                                  {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(favorite.tour.price)}
+                                </p>
+                                <div className="space-x-2">
+                                  <Link
+                                    href={`/tours/${favorite.tour.id}`}
+                                    className="text-primary hover:text-primary-dark"
+                                  >
+                                    Detaylar
+                                  </Link>
+                                  <button
+                                    onClick={() => handleRemoveFavorite(favorite.tour.id)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    Kaldır
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        ) : null
                       ))}
                     </div>
                   )}

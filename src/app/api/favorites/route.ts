@@ -46,6 +46,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { userId, tourId } = body;
+    console.log('Favori ekleme:', { userId, tourId });
     const now = new Date();
     const id = cuid();
 
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     return NextResponse.json(favorite);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Favori eklenirken bir hata oluştu' },
+      { error: 'Favori eklenirken bir hata oluştu', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
