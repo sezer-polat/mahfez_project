@@ -138,7 +138,7 @@ export async function GET() {
 
   // Rezervasyonları tur bilgisiyle birlikte çek
   const result = await pool.query(`
-    SELECT r.*, t.title as tour_title, t.image as tour_image, t.startDate as tour_startDate, t.endDate as tour_endDate
+    SELECT r.*, t.title as tour_title, t.image as tour_image, t."startDate" as tour_startDate, t."endDate" as tour_endDate
     FROM "Reservation" r
     LEFT JOIN "Tour" t ON r."tourId" = t.id
     ORDER BY r."createdAt" DESC
