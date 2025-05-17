@@ -13,8 +13,19 @@ export async function GET() {
     return NextResponse.json(JSON.parse(data));
   }
 
-  const result = await pool.query('SELECT * FROM "Tour" WHERE "isActive" = true ORDER BY "createdAt" DESC LIMIT 3');
-  data = result.rows;
+  // Kategori adıyla birlikte öne çıkan turları çek
+  const result = await pool.query(`
+    SELECT t.*, c.name as category_name
+    FROM "Tour" t
+    LEFT JOIN "Category" c ON t."categoryId" = c.id
+    WHERE t."isActive" = true
+    ORDER BY t."createdAt" DESC
+    LIMIT 3
+  `);
+  data = result.rows.map(row => ({
+    ...row,
+    category: { name: row.category_name },
+  }));
 
   await redis.set('featuredTours', JSON.stringify(data), 'EX', 3600);
 
