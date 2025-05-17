@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { corsHeaders } from '@/lib/cors';
-import redis from '@/lib/redis';
 import { Pool } from 'pg';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -10,11 +9,6 @@ export const dynamic = 'force-dynamic';
 
 // GET: Tüm turları getir
 export async function GET() {
-  let data: any = await redis.get('tours');
-  if (data) {
-    return NextResponse.json(JSON.parse(data));
-  }
-
   // Kategori adıyla birlikte turları çek
   const result = await pool.query(`
     SELECT t.*, c.name as category_name
@@ -22,12 +16,10 @@ export async function GET() {
     LEFT JOIN "Category" c ON t."categoryId" = c.id
     ORDER BY t."createdAt" DESC
   `);
-  data = result.rows.map(row => ({
+  const data = result.rows.map(row => ({
     ...row,
     category: row.category_name ? { name: row.category_name } : { name: 'Kategori Yok' },
   }));
-
-  await redis.set('tours', JSON.stringify(data), 'EX', 3600);
 
   return NextResponse.json(data);
 }
@@ -154,9 +146,6 @@ export async function POST(request: Request) {
         itinerary: true
       }
     });
-
-    // Cache'i temizle
-    await redis.del('tours');
 
     return NextResponse.json(tour);
   } catch (error) {
