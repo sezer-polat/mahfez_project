@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     tourCount: 0,
-    bookingCount: 0,
     userCount: 0,
     messageCount: 0,
   });
@@ -34,10 +33,6 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-900">Toplam Tur</h3>
           <p className="text-3xl font-bold text-primary mt-2">{loading ? '-' : stats.tourCount}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900">Aktif Rezervasyon</h3>
-          <p className="text-3xl font-bold text-primary mt-2">{loading ? '-' : stats.bookingCount}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-900">Toplam Kullanıcı</h3>

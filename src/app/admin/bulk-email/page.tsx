@@ -15,7 +15,6 @@ export default function BulkEmailPage() {
     subject: '',
     content: '',
     filters: {
-      hasBookings: false,
       role: 'USER'
     }
   })
@@ -46,7 +45,6 @@ export default function BulkEmailPage() {
         subject: '',
         content: '',
         filters: {
-          hasBookings: false,
           role: 'USER'
         }
       })

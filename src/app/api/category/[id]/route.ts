@@ -58,7 +58,6 @@ export async function DELETE(
           categoryId: id
         },
         include: {
-          bookings: true,
           itinerary: true,
           images: true,
           reservations: true,
@@ -68,13 +67,6 @@ export async function DELETE(
 
       // Her tur için ilişkili verileri sil
       for (const tour of tours) {
-        // Rezervasyonları sil
-        await tx.booking.deleteMany({
-          where: {
-            tourId: tour.id
-          }
-        });
-
         // Günlük programı sil
         await tx.itinerary.deleteMany({
           where: {

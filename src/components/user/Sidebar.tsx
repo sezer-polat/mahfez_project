@@ -60,16 +60,6 @@ export default function Sidebar() {
             </Link>
 
             <Link
-              href="/bookings"
-              className={`flex items-center px-6 py-3 text-sm ${
-                isActive('/bookings') ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <i className="ri-calendar-check-line mr-3 text-lg"></i>
-              Rezervasyonlarım
-            </Link>
-
-            <Link
               href="/favorites"
               className={`flex items-center px-6 py-3 text-sm ${
                 isActive('/favorites') ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-100'

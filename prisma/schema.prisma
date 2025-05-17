@@ -76,7 +76,6 @@ model Tour {
   startDate   DateTime?
   endDate     DateTime?
   isActive    Boolean      @default(true)
-  bookings    Booking[]
   itinerary   Itinerary[]  @relation("TourItinerary")
   images      TourImage[]  @relation("TourImages")
   reservations Reservation[] @relation("TourReservations")
@@ -90,20 +89,6 @@ model Category {
   tours       Tour[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-}
-
-model Booking {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  tourId    String
-  tour      Tour     @relation(fields: [tourId], references: [id])
-  status    Status   @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  numberOfPeople Int
-  totalPrice Float
-  notes String?
 }
 
 model Settings {

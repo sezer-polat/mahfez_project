@@ -13,7 +13,7 @@ export default function ReportsPage() {
   const [formData, setFormData] = useState({
     startDate: '',
     endDate: '',
-    reportType: 'bookings',
+    reportType: 'reservations',
     format: 'excel'
   });
 
@@ -119,7 +119,7 @@ export default function ReportsPage() {
                       value={formData.reportType}
                       onChange={(e) => setFormData({ ...formData, reportType: e.target.value })}
                     >
-                      <option value="bookings">Rezervasyon Raporu</option>
+                      <option value="reservations">Rezervasyon Raporu</option>
                       <option value="tours">Tur Raporu</option>
                       <option value="financial">Finansal Rapor</option>
                     </select>

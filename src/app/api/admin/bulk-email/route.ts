@@ -27,13 +27,6 @@ export async function POST(req: Request) {
     // Filtrelere göre kullanıcıları bul
     let whereClause = {}
     if (filters) {
-      if (filters.hasBookings) {
-        whereClause = {
-          bookings: {
-            some: {}
-          }
-        }
-      }
       if (filters.role) {
         whereClause = {
           ...whereClause,
