@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       await client.query('BEGIN');
       // Rezervasyonu oluştur
       const reservationResult = await client.query(
-        'INSERT INTO "Reservation" (tourId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, status, totalPrice) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',
+        'INSERT INTO "Reservation" ("tourId", "firstName", "lastName", "email", "phone", "address", "city", "country", "specialRequests", "numberOfPeople", "status", "totalPrice") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',
         [tourId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople]
       );
       // Tur kontenjanını güncelle
