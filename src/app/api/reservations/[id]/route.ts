@@ -65,8 +65,8 @@ export async function PUT(
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error updating reservation:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal Server Error' },
+    return new NextResponse(
+      error instanceof Error ? error.message : 'Internal Server Error',
       { status: 500 }
     );
   }
