@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import redis from '@/lib/redis';
 import { Pool } from 'pg';
+import cuid from 'cuid';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -75,9 +76,10 @@ export async function POST(request: Request) {
     try {
       await client.query('BEGIN');
       const now = new Date();
+      const id = cuid();
       const reservationResult = await client.query(
-        'INSERT INTO "Reservation" ("tourId", "userId", "firstName", "lastName", "email", "phone", "address", "city", "country", "specialRequests", "numberOfPeople", "status", "totalPrice", "createdAt", "updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *',
-        [tourId, userId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople, now, now]
+        'INSERT INTO "Reservation" ("id", "tourId", "userId", "firstName", "lastName", "email", "phone", "address", "city", "country", "specialRequests", "numberOfPeople", "status", "totalPrice", "createdAt", "updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *',
+        [id, tourId, userId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople, now, now]
       );
       await client.query('UPDATE "Tour" SET available = available - $1 WHERE id = $2', [numberOfPeople, tourId]);
       await client.query('COMMIT');
