@@ -5,7 +5,7 @@ export default async function AdminPage() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="p-8">
+    <div className="p-8 ml-64">
       <h1 className="text-2xl font-bold mb-4">Admin Paneli</h1>
       <p className="mb-4">Hoş geldiniz, {session?.user?.name || ''}!</p>
       <div className="bg-white rounded-lg shadow p-6">
