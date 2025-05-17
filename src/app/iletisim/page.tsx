@@ -106,7 +106,7 @@ export default function ContactPage() {
                   <i className="ri-twitter-fill text-2xl"></i>
                 </a>
                 <a
-                  href="@https://www.instagram.com/mahfezturizm/"
+                  href="https://www.instagram.com/mahfezturizm/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-primary"

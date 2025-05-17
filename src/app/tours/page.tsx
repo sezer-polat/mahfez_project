@@ -444,7 +444,7 @@ function ToursContent() {
                     <div className="w-4 h-4 flex items-center justify-center mr-1">
                       <i className="ri-map-pin-line"></i>
                     </div>
-                    <span className="text-sm">{tour.category.name}</span>
+                    <span className="text-sm">{tour.category?.name || 'Kategori Yok'}</span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
                     <div>

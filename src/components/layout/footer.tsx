@@ -31,7 +31,7 @@ export function Footer() {
                 <i className="ri-twitter-fill text-xl"></i>
               </a>
               <a
-                href="@https://www.instagram.com/mahfezturizm/"
+                href="https://www.instagram.com/mahfezturizm/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white"

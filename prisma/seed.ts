@@ -63,7 +63,7 @@ async function main() {
       socialMedia: {
         facebook: 'https://facebook.com',
         twitter: 'https://twitter.com',
-        instagram: '@https://www.instagram.com/mahfezturizm/',
+        instagram: 'https://www.instagram.com/mahfezturizm/',
       },
     },
   })

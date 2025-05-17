@@ -25,7 +25,7 @@ export async function GET() {
           socialMedia: {
             facebook: '',
             twitter: '',
-            instagram: '@https://www.instagram.com/mahfezturizm/',
+            instagram: 'https://www.instagram.com/mahfezturizm/',
           },
         },
       });
