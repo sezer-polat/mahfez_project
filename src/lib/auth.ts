@@ -50,8 +50,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/giris",
-    error: "/giris",
+    signIn: "/admin/giris",
+    error: "/admin/giris",
   },
   session: {
     strategy: "jwt",
