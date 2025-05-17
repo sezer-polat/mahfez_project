@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const isAdminPath = request.nextUrl.pathname.startsWith('/admin');
   const isLoginPath = request.nextUrl.pathname === '/admin/giris';
+  const isRootAdminPath = request.nextUrl.pathname === '/admin';
 
   // Admin sayfalarına erişim kontrolü
   if (isAdminPath) {
@@ -16,6 +17,14 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/admin/dashboard', request.url));
       }
       return NextResponse.next();
+    }
+
+    // Ana admin sayfasına erişim kontrolü
+    if (isRootAdminPath) {
+      if (!token || token.role !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin/giris', request.url));
+      }
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
 
     // Diğer admin sayfalarına erişim kontrolü
