@@ -6,26 +6,29 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Sidebar from '../Sidebar';
 
-interface Booking {
+interface Reservation {
   id: string;
   tour: {
     title: string;
+    image: string;
+    startDate: string;
+    endDate: string;
   };
   firstName: string;
   lastName: string;
   email: string;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  numberOfPeople: number;
   totalPrice: number;
-  participants: number;
   createdAt: string;
 }
 
-export default function BookingsPage() {
+export default function ReservationsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+  const [selectedReservations, setSelectedReservations] = useState<string[]>([]);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
   useEffect(() => {
@@ -37,15 +40,15 @@ export default function BookingsPage() {
   }, [status, session, router]);
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchReservations = async () => {
       try {
-        const response = await fetch('/api/admin/bookings');
+        const response = await fetch('/api/reservations');
         if (response.ok) {
           const data = await response.json();
-          setBookings(data);
+          setReservations(data);
         }
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        console.error('Error fetching reservations:', error);
         toast.error('Rezervasyonlar yüklenirken bir hata oluştu');
       } finally {
         setLoading(false);
@@ -53,7 +56,7 @@ export default function BookingsPage() {
     };
 
     if (session?.user?.role === 'ADMIN') {
-      fetchBookings();
+      fetchReservations();
     }
   }, [session]);
 
@@ -68,8 +71,8 @@ export default function BookingsPage() {
       });
 
       if (response.ok) {
-        setBookings(bookings.map(booking =>
-          booking.id === id ? { ...booking, status: newStatus } : booking
+        setReservations(reservations.map(reservation =>
+          reservation.id === id ? { ...reservation, status: newStatus } : reservation
         ));
         toast.success('Rezervasyon durumu güncellendi');
       } else {
@@ -83,7 +86,7 @@ export default function BookingsPage() {
   };
 
   const handleBulkAction = async (action: 'CONFIRM' | 'CANCEL') => {
-    if (selectedBookings.length === 0) {
+    if (selectedReservations.length === 0) {
       toast.error('Lütfen en az bir rezervasyon seçin');
       return;
     }
@@ -97,7 +100,7 @@ export default function BookingsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingIds: selectedBookings,
+          bookingIds: selectedReservations,
           action
         }),
       });
@@ -109,13 +112,13 @@ export default function BookingsPage() {
       }
 
       toast.success(data.message);
-      setSelectedBookings([]);
+      setSelectedReservations([]);
       
       // Rezervasyonları güncelle
-      setBookings(bookings.map(booking =>
-        selectedBookings.includes(booking.id)
-          ? { ...booking, status: action === 'CONFIRM' ? 'CONFIRMED' : 'CANCELLED' }
-          : booking
+      setReservations(reservations.map(reservation =>
+        selectedReservations.includes(reservation.id)
+          ? { ...reservation, status: action === 'CONFIRM' ? 'CONFIRMED' : 'CANCELLED' }
+          : reservation
       ));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
@@ -160,11 +163,11 @@ export default function BookingsPage() {
       <div className="p-8 ml-64">
         <h1 className="text-2xl font-bold mb-8 ml-[-150px]">Rezervasyonlar</h1>
 
-        {selectedBookings.length > 0 && (
+        {selectedReservations.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-4 mb-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600">
-                {selectedBookings.length} rezervasyon seçildi
+                {selectedReservations.length} rezervasyon seçildi
               </p>
               <div className="space-x-2">
                 <button
@@ -186,124 +189,39 @@ export default function BookingsPage() {
           </div>
         )}
 
-        <div
-          className="bg-white rounded-lg shadow-md overflow-hidden w-full ml-[-150px]"
-          style={{ width: 'calc(100% + 470px)' }}
-        >
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="min-w-[1200px]">
+          <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    checked={selectedBookings.length === bookings.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedBookings(bookings.map(booking => booking.id));
-                      } else {
-                        setSelectedBookings([]);
-                      }
-                    }}
-                  />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tur
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Müşteri
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Durum
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Katılımcı
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Toplam Tutar
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tarih
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  İşlemler
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tur</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Müşteri</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-posta</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kişi Sayısı</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Toplam Tutar</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarih</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
+              {reservations.map((reservation) => (
+                <tr key={reservation.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                      checked={selectedBookings.includes(booking.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedBookings([...selectedBookings, booking.id]);
-                        } else {
-                          setSelectedBookings(selectedBookings.filter(id => id !== booking.id));
-                        }
-                      }}
-                    />
+                    <div className="text-sm font-medium text-gray-900">{reservation.tour?.title || 'Tur Bilgisi Yok'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{booking.tour.title}</div>
+                    <div className="text-sm text-gray-900">{reservation.firstName} {reservation.lastName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{booking.firstName} {booking.lastName}</div>
-                    <div className="text-sm text-gray-500">{booking.email}</div>
+                    <div className="text-sm text-gray-500">{reservation.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(booking.status)}`}>
-                      {getStatusText(booking.status)}
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${reservation.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : reservation.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {reservation.status === 'CONFIRMED' ? 'Onaylandı' : reservation.status === 'CANCELLED' ? 'İptal Edildi' : 'Beklemede'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {booking.participants} kişi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ₺{booking.totalPrice.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(booking.createdAt).toLocaleDateString('tr-TR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="space-x-2">
-                      {booking.status === 'PENDING' && (
-                        <>
-                          <button
-                            onClick={() => handleStatusChange(booking.id, 'CONFIRMED')}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            Onayla
-                          </button>
-                          <button
-                            onClick={() => handleStatusChange(booking.id, 'CANCELLED')}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            İptal Et
-                          </button>
-                        </>
-                      )}
-                      {booking.status === 'CONFIRMED' && (
-                        <button
-                          onClick={() => handleStatusChange(booking.id, 'CANCELLED')}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          İptal Et
-                        </button>
-                      )}
-                      {booking.status === 'CANCELLED' && (
-                        <button
-                          onClick={() => handleStatusChange(booking.id, 'CONFIRMED')}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          Onayla
-                        </button>
-                      )}
-                    </div>
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{reservation.numberOfPeople}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₺{reservation.totalPrice.toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(reservation.createdAt).toLocaleDateString('tr-TR')}</td>
                 </tr>
               ))}
             </tbody>
