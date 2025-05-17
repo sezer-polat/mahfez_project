@@ -161,7 +161,7 @@ export default function ReservationsPage() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <div className="p-8 ml-64">
-        <h1 className="text-2xl font-bold mb-8 ml-[-150px]">Rezervasyonlar</h1>
+        <h1 className="text-2xl font-bold mb-8">Rezervasyonlar</h1>
 
         {selectedReservations.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-4 mb-4">
@@ -189,8 +189,8 @@ export default function ReservationsPage() {
           </div>
         )}
 
-        <div className="min-w-[1200px]">
-          <table className="w-full divide-y divide-gray-200">
+        <div className="w-full bg-white rounded-lg shadow-md overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tur</th>
@@ -200,6 +200,7 @@ export default function ReservationsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kişi Sayısı</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Toplam Tutar</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarih</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -222,6 +223,42 @@ export default function ReservationsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">{reservation.numberOfPeople}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₺{reservation.totalPrice.toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(reservation.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="space-x-2">
+                      {reservation.status === 'PENDING' && (
+                        <>
+                          <button
+                            onClick={() => handleStatusChange(reservation.id, 'CONFIRMED')}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            Onayla
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(reservation.id, 'CANCELLED')}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            İptal Et
+                          </button>
+                        </>
+                      )}
+                      {reservation.status === 'CONFIRMED' && (
+                        <button
+                          onClick={() => handleStatusChange(reservation.id, 'CANCELLED')}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          İptal Et
+                        </button>
+                      )}
+                      {reservation.status === 'CANCELLED' && (
+                        <button
+                          onClick={() => handleStatusChange(reservation.id, 'CONFIRMED')}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          Onayla
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
