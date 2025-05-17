@@ -150,7 +150,8 @@ export default function ProfilePage() {
 
   const fetchFavorites = async () => {
     try {
-      const response = await fetch('/api/favorites');
+      if (!session?.user?.id) return;
+      const response = await fetch(`/api/favorites?userId=${session.user.id}`);
       if (response.ok) {
         const data = await response.json();
         setFavorites(data);

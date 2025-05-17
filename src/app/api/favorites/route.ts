@@ -9,11 +9,18 @@ const cuid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 24);
 export const dynamic = 'force-dynamic';
 
 // GET: Tüm favorileri getir
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
     let data: any = await redis.get('favorites');
     if (data) {
-      return NextResponse.json(JSON.parse(data));
+      let parsed = JSON.parse(data);
+      if (userId) {
+        parsed = parsed.filter((fav: any) => fav.userId === userId);
+      }
+      return NextResponse.json(parsed);
     }
 
     // Favorilerle birlikte ilgili turun ve kategorisinin adını çek
@@ -38,6 +45,10 @@ export async function GET() {
           category: row.category_name ? { name: row.category_name } : null,
         },
       }));
+
+    if (userId) {
+      data = data.filter((fav: any) => fav.userId === userId);
+    }
 
     await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
 

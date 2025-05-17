@@ -110,7 +110,30 @@ export async function POST(request: Request) {
 export async function GET() {
   let data: any = await redis.get('reservations');
   if (data) {
-    return NextResponse.json(JSON.parse(data));
+    // Cache'ten gelen veri eski formatta olabilir, dönüştür
+    let parsed = JSON.parse(data);
+    // Eğer ilk elemanda tour yoksa, dönüştür
+    if (Array.isArray(parsed) && parsed.length > 0 && !parsed[0].tour) {
+      // Tur bilgilerini topluca çekmek için id'leri topla
+      const tourIds = [...new Set(parsed.map(r => r.tourId))];
+      const { rows: tours } = await pool.query(
+        `SELECT id, title, image, "startDate", "endDate" FROM "Tour" WHERE id = ANY($1)`,
+        [tourIds]
+      );
+      const tourMap = Object.fromEntries(tours.map(t => [t.id, t]));
+      parsed = parsed.map(r => ({
+        ...r,
+        tour: tourMap[r.tourId]
+          ? {
+              title: tourMap[r.tourId].title,
+              image: tourMap[r.tourId].image,
+              startDate: tourMap[r.tourId].startDate,
+              endDate: tourMap[r.tourId].endDate,
+            }
+          : null,
+      }));
+    }
+    return NextResponse.json(parsed);
   }
 
   // Rezervasyonları tur bilgisiyle birlikte çek
