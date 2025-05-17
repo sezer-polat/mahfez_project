@@ -23,6 +23,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="tr">
       <head>
@@ -186,7 +188,7 @@ export default async function RootLayout({
         `}} />
       </head>
       <body className={inter.className}>
-        <SessionProvider>
+        <SessionProvider session={session}>
           <AuthProvider>
             <div className="min-h-screen flex flex-col">
               <Navbar />
