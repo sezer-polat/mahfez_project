@@ -60,4 +60,43 @@ export async function DELETE(request: Request) {
   }
   await prisma.sliderImage.delete({ where: { id } });
   return new NextResponse(null, { status: 204 });
+}
+
+export async function PUT(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== 'ADMIN') {
+    return new NextResponse('Unauthorized', { status: 401 });
+  }
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) {
+    return new NextResponse('ID is required', { status: 400 });
+  }
+  const formData = await request.formData();
+  let updateData: any = {};
+  const file = formData.get('file') as File | null;
+  const title = formData.get('title') as string | null;
+  const description = formData.get('description') as string | null;
+  if (title !== null) updateData.title = title;
+  if (description !== null) updateData.description = description;
+  if (file && file.size > 0) {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: 'mahfez_slider', resource_type: 'image' },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
+    // @ts-ignore
+    updateData.url = uploadResult.secure_url;
+  }
+  const updated = await prisma.sliderImage.update({
+    where: { id },
+    data: updateData,
+  });
+  return NextResponse.json(updated);
 } 
