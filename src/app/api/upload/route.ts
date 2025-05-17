@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
-import sharp from 'sharp';
+import { v2 as cloudinary } from 'cloudinary';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -24,37 +25,22 @@ export async function POST(request: Request) {
       return new NextResponse('File is required', { status: 400 });
     }
 
-    // Dosya tipi kontrolü
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return new NextResponse('Only JPEG, PNG and WebP formats are supported', {
-        status: 400,
-      });
-    }
-
-    // Dosya boyutu kontrolü
-    if (file.size > MAX_FILE_SIZE) {
-      return new NextResponse('File size must be less than 5MB', { status: 400 });
-    }
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Resmi optimize et
-    const optimizedImage = await sharp(buffer)
-      .resize(1200, 800, { fit: 'inside' })
-      .webp({ quality: 80 })
-      .toBuffer();
+    // Cloudinary'ye yükle
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: 'mahfez_tours', resource_type: 'image' },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
 
-    // Dosya adını oluştur
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const fileName = `${uniqueSuffix}.webp`;
-
-    // Dosyayı kaydet
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, optimizedImage);
-
-    return NextResponse.json({ url: `/uploads/${fileName}` });
+    // @ts-ignore
+    return NextResponse.json({ url: uploadResult.secure_url });
   } catch (error) {
     console.error('Error uploading file:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
