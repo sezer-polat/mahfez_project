@@ -5,21 +5,23 @@ import { redirect } from 'next/navigation';
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    redirect('/admin/giris');
-  }
-
-  if (session.user?.role !== 'ADMIN') {
+  // Session yoksa veya kullanıcı admin değilse giriş sayfasına yönlendir
+  if (!session || !session.user || session.user.role !== 'ADMIN') {
     redirect('/admin/giris');
   }
 
   return (
-    <div>
+    <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Admin Paneli</h1>
-      <p>Hoş geldiniz, {session.user.name}!</p>
-      <pre className="mt-4 p-4 bg-gray-100 rounded">
-        {JSON.stringify(session, null, 2)}
-      </pre>
+      <p className="mb-4">Hoş geldiniz, {session.user.name}!</p>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Kullanıcı Bilgileri</h2>
+        <div className="space-y-2">
+          <p><span className="font-medium">Ad Soyad:</span> {session.user.name}</p>
+          <p><span className="font-medium">Email:</span> {session.user.email}</p>
+          <p><span className="font-medium">Rol:</span> {session.user.role}</p>
+        </div>
+      </div>
     </div>
   );
 } 
