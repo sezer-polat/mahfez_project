@@ -26,7 +26,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
-    return null;
+    return (
+      <div>
+        <pre>{JSON.stringify({ session, status }, null, 2)}</pre>
+        <p>Giriş yapılmadı veya admin yetkisi yok.</p>
+      </div>
+    );
   }
 
   return (
