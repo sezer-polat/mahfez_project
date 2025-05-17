@@ -13,8 +13,26 @@ export async function GET() {
     return NextResponse.json(JSON.parse(data));
   }
 
-  const result = await pool.query('SELECT * FROM "Favorite" ORDER BY "createdAt" DESC');
-  data = result.rows;
+  // Favorilerle birlikte ilgili turun ve kategorisinin adını çek
+  const result = await pool.query(`
+    SELECT f.*, t.title as tour_title, t.image as tour_image, t.price as tour_price, t.startDate as tour_startDate, t.endDate as tour_endDate, c.name as category_name
+    FROM "Favorite" f
+    LEFT JOIN "Tour" t ON f."tourId" = t.id
+    LEFT JOIN "Category" c ON t."categoryId" = c.id
+    ORDER BY f."createdAt" DESC
+  `);
+  data = result.rows.map(row => ({
+    ...row,
+    tour: {
+      id: row.tourId,
+      title: row.tour_title,
+      image: row.tour_image,
+      price: row.tour_price,
+      startDate: row.tour_startDate,
+      endDate: row.tour_endDate,
+      category: { name: row.category_name },
+    },
+  }));
 
   await redis.set('favorites', JSON.stringify(data), 'EX', 3600);
 

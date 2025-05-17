@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import redis from '@/lib/redis';
 import { Pool } from 'pg';
 
-const prisma = new PrismaClient();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export const dynamic = 'force-dynamic';
@@ -29,12 +27,12 @@ export async function POST(req: NextRequest) {
   if (!name) {
     return NextResponse.json({ error: 'Kategori adı zorunludur.' }, { status: 400 });
   }
-  const category = await prisma.category.create({
-    data: { 
-      name, 
-      description,
-      updatedAt: new Date()
-    },
-  });
+  const insertResult = await pool.query(
+    'INSERT INTO "Category" (name, description, "updatedAt") VALUES ($1, $2, NOW()) RETURNING *',
+    [name, description]
+  );
+  const category = insertResult.rows[0];
+  // Cache'i temizle
+  await redis.del('categories');
   return NextResponse.json(category, { status: 201 });
 } 
