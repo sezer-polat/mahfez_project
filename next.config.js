@@ -3,12 +3,17 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['readdy.ai'],
+    domains: ['readdy.ai', 'res.cloudinary.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'readdy.ai',
         pathname: '/api/search-image/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
       },
     ],
   },
