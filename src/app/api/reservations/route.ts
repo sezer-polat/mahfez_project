@@ -10,6 +10,10 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.id) {
+      return NextResponse.json({ error: 'Giriş yapmalısınız.' }, { status: 401 });
+    }
     const body = await request.json();
     const {
       tourId,
@@ -24,10 +28,9 @@ export async function POST(request: Request) {
       numberOfPeople: rawNumberOfPeople,
     } = body;
 
-    // numberOfPeople'ı number'a çevir
+    const userId = session.user.id;
     const numberOfPeople = Number(rawNumberOfPeople);
 
-    // Eksik alan kontrolü
     if (
       !tourId ||
       !firstName ||
@@ -38,7 +41,8 @@ export async function POST(request: Request) {
       !city ||
       !country ||
       isNaN(numberOfPeople) ||
-      numberOfPeople < 1
+      numberOfPeople < 1 ||
+      !userId
     ) {
       return NextResponse.json(
         { error: 'Tüm alanları eksiksiz ve doğru doldurmalısınız.' },
@@ -60,7 +64,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Kontenjan kontrolü
     if (tour.available < numberOfPeople) {
       return NextResponse.json(
         { error: 'Yeterli kontenjan bulunmamaktadır' },
@@ -68,20 +71,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Transaction başlat
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      // Rezervasyonu oluştur
       const now = new Date();
       const reservationResult = await client.query(
-        'INSERT INTO "Reservation" ("tourId", "firstName", "lastName", "email", "phone", "address", "city", "country", "specialRequests", "numberOfPeople", "status", "totalPrice", "createdAt", "updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *',
-        [tourId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople, now, now]
+        'INSERT INTO "Reservation" ("tourId", "userId", "firstName", "lastName", "email", "phone", "address", "city", "country", "specialRequests", "numberOfPeople", "status", "totalPrice", "createdAt", "updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *',
+        [tourId, userId, firstName, lastName, email, phone, address, city, country, specialRequests, numberOfPeople, 'PENDING', tour.price * numberOfPeople, now, now]
       );
-      // Tur kontenjanını güncelle
       await client.query('UPDATE "Tour" SET available = available - $1 WHERE id = $2', [numberOfPeople, tourId]);
       await client.query('COMMIT');
-      // Cache'i temizle
       await redis.del('reservations');
       return NextResponse.json(reservationResult.rows[0]);
     } catch (err) {
