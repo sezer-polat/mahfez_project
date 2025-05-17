@@ -19,7 +19,7 @@ export async function PUT(
     const body = await request.json();
     const { status } = body;
 
-    if (!status || !['CANCELLED'].includes(status)) {
+    if (!status || !['CONFIRMED', 'CANCELLED'].includes(status)) {
       return new NextResponse('Invalid status', { status: 400 });
     }
 
@@ -35,14 +35,16 @@ export async function PUT(
         throw new Error('Rezervasyon bulunamadı');
       }
 
-      // Rezervasyonun e-posta adresi ile oturum açan kullanıcının e-posta adresi eşleşmeli
-      if (reservation.email !== session.user.email) {
+      // Sadece admin veya rezervasyon sahibi güncelleyebilir
+      if (
+        session.user.role !== 'ADMIN' &&
+        reservation.email !== session.user.email
+      ) {
         throw new Error('Bu rezervasyonu değiştirme yetkiniz yok');
       }
 
-      // Sadece onaylanmış rezervasyonlar iptal edilebilir
+      // İptal işlemi: CONFIRMED'dan CANCELLED'a geçerken tur kapasitesini artır
       if (status === 'CANCELLED' && reservation.status === 'CONFIRMED') {
-        // Tur kapasitesini artır
         await tx.tour.update({
           where: { id: reservation.tourId },
           data: {
@@ -51,8 +53,6 @@ export async function PUT(
             }
           }
         });
-      } else {
-        throw new Error('Sadece onaylanmış rezervasyonlar iptal edilebilir');
       }
 
       // Rezervasyon durumunu güncelle

@@ -80,10 +80,10 @@ export default function Sidebar() {
             Kategoriler
           </button>
           <button
-            onClick={() => handleNavigation('/admin/bookings')}
-            className={`flex items-center w-full px-4 py-2 rounded-lg ${isActive('/admin/bookings')}`}
+            onClick={() => handleNavigation('/admin/reservations')}
+            className={`flex items-center w-full px-4 py-2 rounded-lg ${isActive('/admin/reservations')}`}
             aria-label="Rezervasyonlar"
-            aria-current={isCurrent('/admin/bookings') ? 'page' : undefined}
+            aria-current={isCurrent('/admin/reservations') ? 'page' : undefined}
           >
             <i className="ri-calendar-check-line mr-3"></i>
             Rezervasyonlar
