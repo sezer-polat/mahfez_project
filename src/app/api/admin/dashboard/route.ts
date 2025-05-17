@@ -3,15 +3,15 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const [tourCount, bookingCount, userCount, messageCount] = await Promise.all([
+    const [tourCount, reservationCount, userCount, messageCount] = await Promise.all([
       prisma.tour.count(),
-      prisma.booking.count(),
+      prisma.reservation.count(),
       prisma.user.count(),
       prisma.contactMessage.count(),
     ]);
     return NextResponse.json({
       tourCount,
-      bookingCount,
+      reservationCount,
       userCount,
       messageCount,
     });
