@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface Tour {
   id: string;
@@ -53,6 +54,7 @@ function ToursContent() {
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'date'>(searchParams.get('sort') as 'price-asc' | 'price-desc' | 'date' || 'date');
   const [showAllTours, setShowAllTours] = useState(!searchParams.get('category'));
   const [favorites, setFavorites] = useState<string[]>([]);
+  const { data: session } = useSession();
 
   // URL parametrelerini güncelle
   const updateUrlParams = () => {
@@ -182,17 +184,19 @@ function ToursContent() {
   };
 
   const handleToggleFavorite = async (tourId: string) => {
+    if (!session?.user?.id) {
+      toast.error('Favorilere eklemek için giriş yapmalısınız');
+      return;
+    }
     try {
       if (!favorites.includes(tourId)) {
         // Favoriye ekle
         const res = await fetch('/api/favorites', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tourId }),
+          body: JSON.stringify({ tourId, userId: session.user.id }),
         });
-        
         const data = await res.json();
-        
         if (res.ok) {
           setFavorites([...favorites, tourId]);
           toast.success('Favorilere eklendi');
@@ -201,12 +205,10 @@ function ToursContent() {
         }
       } else {
         // Favoriden çıkar
-        const res = await fetch(`/api/favorites?tourId=${tourId}`, { 
-          method: 'DELETE' 
+        const res = await fetch(`/api/favorites?tourId=${tourId}&userId=${session.user.id}`, {
+          method: 'DELETE'
         });
-        
         const data = await res.json();
-        
         if (res.ok) {
           setFavorites(favorites.filter(id => id !== tourId));
           toast.success('Favorilerden çıkarıldı');

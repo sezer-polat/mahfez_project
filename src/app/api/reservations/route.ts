@@ -24,6 +24,14 @@ export async function POST(request: Request) {
       numberOfPeople,
     } = body;
 
+    // Eksik alan kontrolü
+    if (!tourId || !firstName || !lastName || !email || !phone || !address || !city || !country || !numberOfPeople) {
+      return NextResponse.json(
+        { error: 'Tüm alanları doldurmalısınız.' },
+        { status: 400 }
+      );
+    }
+
     // Turu kontrol et
     const tourResult = await pool.query('SELECT * FROM "Tour" WHERE id = $1', [tourId]);
     const tour = tourResult.rows[0];
