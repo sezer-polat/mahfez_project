@@ -30,7 +30,7 @@ export async function GET() {
       price: row.tour_price,
       startDate: row.tour_startDate,
       endDate: row.tour_endDate,
-      category: { name: row.category_name },
+      category: row.category_name ? { name: row.category_name } : null,
     },
   }));
 

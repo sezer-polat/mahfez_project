@@ -148,7 +148,7 @@ function ToursContent() {
     }
     
     // Tüm turlar seçili değilse hem kategori hem fiyat filtresini uygula
-    const matchesCategory = !selectedCategory || tour.category.name === selectedCategory;
+    const matchesCategory = !selectedCategory || (tour.category && tour.category.name === selectedCategory);
     return matchesCategory && matchesPrice;
   }).sort((a, b) => {
     switch (sortBy) {

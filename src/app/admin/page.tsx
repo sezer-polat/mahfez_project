@@ -40,7 +40,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/admin/giris')
     } else if (session?.user?.role !== 'ADMIN') {
       router.push('/')
     }
