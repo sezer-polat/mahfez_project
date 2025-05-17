@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
-import { Status } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
