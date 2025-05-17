@@ -155,6 +155,9 @@ export async function POST(request: Request) {
       }
     });
 
+    // Cache'i temizle
+    await redis.del('tours');
+
     return NextResponse.json(tour);
   } catch (error) {
     console.error('Error creating tour:', error);
