@@ -14,6 +14,9 @@ export default function SliderPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
+  const updateInputRef = useRef<HTMLInputElement>(null);
 
   // Slider görsellerini getir
   const fetchImages = async () => {
@@ -66,6 +69,40 @@ export default function SliderPage() {
     setLoading(false);
   };
 
+  // Slider görselini güncelle
+  const handleUpdate = (id: string) => {
+    setEditingId(id);
+    if (updateInputRef.current) {
+      updateInputRef.current.value = '';
+      updateInputRef.current.click();
+    }
+  };
+
+  const handleUpdateFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editingId) return;
+    const file = e.target.files?.[0];
+    if (!file) {
+      setEditingId(null);
+      return;
+    }
+    setUpdating(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    // İstersen title/description da ekleyebilirsin
+    const res = await fetch(`/api/admin/slider?id=${editingId}`, {
+      method: 'PUT',
+      body: formData,
+    });
+    if (res.ok) {
+      fetchImages();
+    } else {
+      alert('Güncelleme başarısız!');
+    }
+    setUpdating(false);
+    setEditingId(null);
+    if (updateInputRef.current) updateInputRef.current.value = '';
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Slider Yönetimi</h1>
@@ -94,8 +131,25 @@ export default function SliderPage() {
               >
                 <i className="ri-delete-bin-line"></i>
               </button>
+              <button
+                onClick={() => handleUpdate(img.id)}
+                className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-1 opacity-80 hover:opacity-100"
+                title="Güncelle"
+                disabled={updating}
+              >
+                <i className="ri-edit-2-line"></i>
+              </button>
             </div>
           ))}
+          {/* Gizli input, güncelleme için */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={updateInputRef}
+            onChange={handleUpdateFile}
+            className="hidden"
+            disabled={updating}
+          />
         </div>
       )}
       {images.length === 0 && !loading && (
