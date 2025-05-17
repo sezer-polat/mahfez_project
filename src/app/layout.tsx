@@ -8,8 +8,6 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import SessionProvider from '@/components/SessionProvider';
 import { Toaster } from 'react-hot-toast';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +16,11 @@ export const metadata: Metadata = {
   description: "Hac ve Umre turlarında güvenilir adresiniz",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
   return (
     <html lang="tr">
       <head>
@@ -188,7 +184,7 @@ export default async function RootLayout({
         `}} />
       </head>
       <body className={inter.className}>
-        <SessionProvider session={session}>
+        <SessionProvider>
           <AuthProvider>
             <div className="min-h-screen flex flex-col">
               <Navbar />
