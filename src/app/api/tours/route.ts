@@ -15,8 +15,17 @@ export async function GET() {
     return NextResponse.json(JSON.parse(data));
   }
 
-  const result = await pool.query('SELECT * FROM "Tour" ORDER BY "createdAt" DESC');
-  data = result.rows;
+  // Kategori adıyla birlikte turları çek
+  const result = await pool.query(`
+    SELECT t.*, c.name as category_name
+    FROM "Tour" t
+    LEFT JOIN "Category" c ON t."categoryId" = c.id
+    ORDER BY t."createdAt" DESC
+  `);
+  data = result.rows.map(row => ({
+    ...row,
+    category: { name: row.category_name },
+  }));
 
   await redis.set('tours', JSON.stringify(data), 'EX', 3600);
 
