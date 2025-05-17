@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div>
       <Sidebar />
-      <main>{children}</main>
+      <main className="ml-64">{children}</main>
     </div>
   );
 } 
