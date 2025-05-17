@@ -94,6 +94,13 @@ export default function Sidebar() {
             <i className="ri-mail-line mr-3"></i>
             İletişim Mesajları
           </Link>
+          <Link
+            href="/admin/slider"
+            className={`flex items-center px-4 py-2 rounded-lg ${isActive('/admin/slider')}`}
+          >
+            <i className="ri-slideshow-line mr-3"></i>
+            Slider Yönetimi
+          </Link>
         </nav>
 
         {/* User Info */}
