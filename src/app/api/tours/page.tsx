@@ -1,1 +1,0 @@
-<span className="text-sm">{tour.category?.name || 'Kategori Yok'}</span> 
