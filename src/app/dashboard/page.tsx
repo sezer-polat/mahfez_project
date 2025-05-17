@@ -93,7 +93,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Öne Çıkan Turlar</h2>
           <Link
-            href="/turlar"
+            href="/tours"
             className="text-primary hover:text-opacity-80 text-sm font-medium"
           >
             Tümünü Gör
@@ -127,7 +127,7 @@ export default function Dashboard() {
                     {tour.price.toLocaleString('tr-TR')} ₺
                   </span>
                   <Link
-                    href={`/turlar/${tour.id}`}
+                    href={`/tours/${tour.id}`}
                     className="text-primary hover:text-opacity-80 text-sm font-medium"
                   >
                     Detayları Gör
@@ -191,7 +191,7 @@ export default function Dashboard() {
                         : 'Tamamlandı'}
                     </span>
                     <Link
-                      href={`/turlar/${booking.tour.id}`}
+                      href={`/tours/${booking.tour.id}`}
                       className="text-primary hover:text-opacity-80 text-sm font-medium"
                     >
                       Tur Detayları

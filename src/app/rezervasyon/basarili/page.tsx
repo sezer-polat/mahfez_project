@@ -37,7 +37,7 @@ export default function ReservationSuccessPage() {
               Ana Sayfaya Dön
             </Link>
             <Link
-              href="/turlar"
+              href="/tours"
               className="block w-full border border-gray-300 text-gray-700 py-3 rounded-button hover:bg-gray-50 transition-colors text-center"
             >
               Diğer Turları Keşfet

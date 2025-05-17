@@ -51,7 +51,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/turlar" className="text-gray-400 hover:text-white">
+                <Link href="/tours" className="text-gray-400 hover:text-white">
                   Turlar
                 </Link>
               </li>

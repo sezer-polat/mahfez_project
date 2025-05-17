@@ -151,7 +151,7 @@ export default function MyBookings() {
         <div className="bg-white rounded-lg shadow p-6 text-center">
           <p className="text-gray-600">Henüz rezervasyonunuz bulunmuyor.</p>
           <Link
-            href="/turlar"
+            href="/tours"
             className="inline-block mt-4 text-primary hover:text-opacity-80"
           >
             Turları Görüntüle
@@ -203,7 +203,7 @@ export default function MyBookings() {
                 </div>
                 <div className="mt-4 md:mt-0 space-x-2">
                   <Link
-                    href={`/turlar/${booking.tour.id}`}
+                    href={`/tours/${booking.tour.id}`}
                     className="inline-block px-4 py-2 text-sm text-primary hover:text-opacity-80"
                   >
                     Tur Detayları

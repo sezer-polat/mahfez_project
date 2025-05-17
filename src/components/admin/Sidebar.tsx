@@ -62,10 +62,10 @@ export default function Sidebar() {
             Dashboard
           </button>
           <button
-            onClick={() => handleNavigation('/admin/tours')}
-            className={`flex items-center w-full px-4 py-2 rounded-lg ${isActive('/admin/tours')}`}
+            onClick={() => handleNavigation('/tours')}
+            className={`flex items-center w-full px-4 py-2 rounded-lg ${isActive('/tours')}`}
             aria-label="Turlar"
-            aria-current={isCurrent('/admin/tours') ? 'page' : undefined}
+            aria-current={isCurrent('/tours') ? 'page' : undefined}
           >
             <i className="ri-map-pin-line mr-3"></i>
             Turlar

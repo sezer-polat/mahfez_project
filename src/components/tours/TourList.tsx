@@ -220,13 +220,13 @@ export function TourList() {
               </div>
               <div className="flex space-x-2">
                 <Link
-                  href={`/turlar/${tour.id}`}
+                  href={`/tours/${tour.id}`}
                   className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-button hover:bg-gray-50 transition-colors text-center"
                 >
                   Detaylar
                 </Link>
                 <Link
-                  href={`/turlar/${tour.id}/rezervasyon`}
+                  href={`/tours/${tour.id}/rezervasyon`}
                   className="flex-1 bg-primary text-white py-2 rounded-button hover:bg-opacity-90 transition-colors text-center"
                 >
                   Rezervasyon

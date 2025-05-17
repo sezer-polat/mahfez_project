@@ -476,7 +476,7 @@ export default function ProfilePage() {
                               </p>
                               <div className="space-x-2">
                                 <Link
-                                  href={`/turlar/${favorite.tour.id}`}
+                                  href={`/tours/${favorite.tour.id}`}
                                   className="text-primary hover:text-primary-dark"
                                 >
                                   Detaylar

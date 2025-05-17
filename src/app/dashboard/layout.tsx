@@ -59,7 +59,7 @@ export default function DashboardLayout({
               Profilim
             </Link>
             <Link
-              href="/turlar"
+              href="/tours"
               className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               <i className="ri-map-pin-line mr-2"></i>
