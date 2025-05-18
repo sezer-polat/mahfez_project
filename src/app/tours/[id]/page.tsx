@@ -96,6 +96,9 @@ export default function TourDetailPage() {
         </div>
       </div>
 
+      {/* Fotoğraf Galerisi */}
+      {/* ... bu bölüm tamamen kaldırıldı ... */}
+
       {/* Günlük Program Navigasyonu */}
       <div className="mb-8">
         <div className="flex space-x-2 overflow-x-auto pb-2">
@@ -166,8 +169,23 @@ export default function TourDetailPage() {
             </div>
           </div>
 
-          {/* Sağ Taraf - Rezervasyon ve Bilgiler */}
+          {/* Sağ Taraf - Günün Fotoğrafı ve Bilgiler */}
           <div className="space-y-6">
+            {/* Günün Fotoğrafı */}
+            {tour.images && tour.images.length >= currentDay && tour.images[currentDay - 1] && (
+              <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col items-center">
+                <div className="relative aspect-video w-full rounded-lg overflow-hidden mb-2" style={{ minHeight: 180 }}>
+                  <Image
+                    src={tour.images[currentDay - 1].url}
+                    alt={tour.images[currentDay - 1].title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="text-sm text-gray-700 text-center">{tour.images[currentDay - 1].title}</div>
+              </div>
+            )}
+
             {/* Fiyat ve Rezervasyon */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="mb-4">
@@ -217,8 +235,6 @@ export default function TourDetailPage() {
               </button>
             </div>
 
-          
-           
           </div>
         </div>
       )}
