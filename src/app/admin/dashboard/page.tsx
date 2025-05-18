@@ -82,7 +82,7 @@ export default function AdminDashboard() {
                     <div className="font-semibold text-gray-800">{reservation.tour?.title}</div>
                     <div className="text-sm text-gray-600">{reservation.firstName} {reservation.lastName}</div>
                     <div className="text-sm text-gray-600">Katılımcı: {reservation.numberOfPeople}</div>
-                    <div className="text-sm text-gray-600">Tutar: ₺{reservation.totalPrice?.toLocaleString('tr-TR')}</div>
+                    <div className="text-sm text-gray-600">Tutar: ${reservation.totalPrice?.toLocaleString('en-US')} $</div>
                     <div className="text-sm text-gray-600">Tarih: {new Date(reservation.createdAt).toLocaleDateString('tr-TR')}</div>
                   </div>
                   <span className={`mt-2 md:mt-0 px-2 py-1 rounded-full text-xs ${

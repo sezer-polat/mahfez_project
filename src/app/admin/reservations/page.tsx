@@ -251,7 +251,7 @@ export default function ReservationsPage() {
                     {reservation.numberOfPeople} kişi
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ₺{reservation.totalPrice.toLocaleString()}
+                    ${reservation.totalPrice.toLocaleString('en-US')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(reservation.createdAt).toLocaleDateString('tr-TR')}

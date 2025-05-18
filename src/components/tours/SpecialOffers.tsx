@@ -41,8 +41,8 @@ export function SpecialOffers() {
               <h3 className="text-2xl font-bold mb-2">{offer.title}</h3>
               <p className="text-lg mb-4">{offer.description}</p>
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold">{offer.discountedPrice} ₺</span>
-                <span className="text-lg line-through opacity-75">{offer.originalPrice} ₺</span>
+                <span className="text-3xl font-bold">{offer.discountedPrice} $</span>
+                <span className="text-lg line-through opacity-75">{offer.originalPrice} $</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Son Geçerlilik: {offer.validUntil}</span>

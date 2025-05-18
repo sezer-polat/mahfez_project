@@ -423,7 +423,7 @@ export default function ProfilePage() {
                                     </p>
                                     <p className="text-sm">
                                       <span className="font-medium">Toplam Tutar:</span>{' '}
-                                      {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(reservation.totalPrice)}
+                                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(reservation.totalPrice)}
                                     </p>
                                   </div>
                                   <div className="flex flex-col items-end space-y-2">
@@ -476,7 +476,7 @@ export default function ProfilePage() {
                               </p>
                               <div className="flex items-center justify-between">
                                 <p className="font-medium">
-                                  {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(favorite.tour.price)}
+                                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(favorite.tour.price)}
                                 </p>
                                 <div className="space-x-2">
                                   <Link

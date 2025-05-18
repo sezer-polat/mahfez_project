@@ -139,7 +139,7 @@ export default function NewTourPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                  Fiyat (₺)
+                  Fiyat ($)
                 </label>
                 <input
                   type="number"

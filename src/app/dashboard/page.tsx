@@ -145,7 +145,7 @@ export default function Dashboard() {
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-primary font-semibold">
-                    {tour.price.toLocaleString('tr-TR')} ₺
+                    {tour.price.toLocaleString('en-US')} $
                   </span>
                   <Link
                     href={`/tours/${tour.id}`}
@@ -194,7 +194,7 @@ export default function Dashboard() {
                       Katılımcı Sayısı: {reservation.numberOfPeople}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Toplam Tutar: {reservation.totalPrice.toLocaleString('tr-TR')} ₺
+                      Toplam Tutar: {reservation.totalPrice.toLocaleString('en-US')} $
                     </p>
                   </div>
                   <div className="mt-4 md:mt-0 flex items-center space-x-4">

@@ -50,7 +50,7 @@ export default function TermsPage() {
             Ödemeler aşağıdaki koşullara tabidir:
           </p>
           <ul>
-            <li>Tüm ödemeler TL cinsinden yapılır</li>
+            <li>Tüm ödemeler USD (Amerikan Doları) cinsinden yapılır</li>
             <li>Kredi kartı ile ödemelerde 3D Secure kullanılır</li>
             <li>Havale/EFT ile ödemelerde banka dekontu talep edilir</li>
             <li>Ödeme onayı sonrası rezervasyon kesinleşir</li>

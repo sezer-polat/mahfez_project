@@ -314,9 +314,9 @@ function ToursContent() {
                 />
               </div>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>₺0</span>
-                <span>₺{priceRange.toLocaleString('tr-TR')}</span>
-                <span>₺1.000.000</span>
+                <span>$0</span>
+                <span>${priceRange.toLocaleString('en-US')}</span>
+                <span>$1,000,000</span>
               </div>
             </div>
 
@@ -452,7 +452,7 @@ function ToursContent() {
                     <div>
                       <span className="text-xs text-gray-500">Başlayan fiyatlarla</span>
                       <div className="font-bold text-lg text-primary">
-                        ₺{tour.price.toLocaleString('tr-TR')}
+                        ${tour.price.toLocaleString('en-US')}
                       </div>
                     </div>
                     <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">

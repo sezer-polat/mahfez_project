@@ -157,7 +157,7 @@ export async function GET(req: Request) {
             doc.fontSize(10).text(`Tur ID: ${reservation.tourId}`);
             doc.text(`Ad Soyad: ${reservation.firstName} ${reservation.lastName}`);
             doc.text(`Durum: ${reservation.status}`);
-            doc.text(`Toplam Tutar: ₺${reservation.totalPrice}`);
+            doc.text(`Toplam Tutar: $${reservation.totalPrice}`);
             doc.text(`Tarih: ${new Date(reservation.createdAt).toLocaleDateString('tr-TR')}`);
             doc.moveDown();
           });
@@ -167,7 +167,7 @@ export async function GET(req: Request) {
             doc.fontSize(12).text(`Tur ID: ${tour.id}`);
             doc.fontSize(10).text(`Başlık: ${tour.title}`);
             doc.text(`Kategori ID: ${tour.categoryId}`);
-            doc.text(`Fiyat: ₺${tour.price}`);
+            doc.text(`Fiyat: $${tour.price}`);
             doc.text(`Oluşturulma Tarihi: ${new Date(tour.createdAt).toLocaleDateString('tr-TR')}`);
             doc.moveDown();
           });
@@ -176,7 +176,7 @@ export async function GET(req: Request) {
           data.forEach((reservation: any) => {
             doc.fontSize(12).text(`Tarih: ${new Date(reservation.createdAt).toLocaleDateString('tr-TR')}`);
             doc.fontSize(10).text(`Tur ID: ${reservation.tourId}`);
-            doc.text(`Tutar: ₺${reservation.totalPrice}`);
+            doc.text(`Tutar: $${reservation.totalPrice}`);
             doc.moveDown();
           });
           break;

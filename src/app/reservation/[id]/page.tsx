@@ -136,7 +136,7 @@ export default function ReservationPage() {
                 <p><span className="font-semibold">Kategori:</span> {tour.category.name}</p>
                 <p><span className="font-semibold">Başlangıç:</span> {new Date(tour.startDate).toLocaleDateString('tr-TR')}</p>
                 <p><span className="font-semibold">Bitiş:</span> {new Date(tour.endDate).toLocaleDateString('tr-TR')}</p>
-                <p><span className="font-semibold">Fiyat:</span> ₺{tour.price.toLocaleString('tr-TR')}</p>
+                <p><span className="font-semibold">Fiyat:</span> ${tour.price.toLocaleString('en-US')}</p>
                 <p><span className="font-semibold">Kalan Kontenjan:</span> {tour.available}</p>
               </div>
             </div>

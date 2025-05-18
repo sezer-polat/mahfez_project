@@ -80,7 +80,7 @@ export function FeaturedTours() {
             </div>
             <p className="text-gray-600 mb-4">{tour.description}</p>
             <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-primary">{tour.price?.toLocaleString('tr-TR')} ₺</span>
+              <span className="text-2xl font-bold text-primary">{tour.price?.toLocaleString('en-US')} $</span>
               <Link
                 href={`/tours/${tour.id}`}
                 className="bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors"

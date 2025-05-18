@@ -52,7 +52,7 @@ export function TourCard({ tour }: TourCardProps) {
             <span>{tour.duration}</span>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-primary">{tour.price.toLocaleString('tr-TR')} TL</div>
+            <div className="text-2xl font-bold text-primary">{tour.price.toLocaleString('en-US')} $</div>
             <div className="text-sm text-gray-500">kişi başı</div>
           </div>
         </div>

@@ -190,9 +190,7 @@ export default function TourDetailPage() {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="mb-4">
                 <span className="text-sm text-gray-500">Başlayan fiyatlarla</span>
-                <div className="font-bold text-2xl text-primary">
-                  ₺{tour.price.toLocaleString('tr-TR')}
-                </div>
+                <div className="font-bold text-2xl text-primary">${tour.price.toLocaleString('en-US')} $</div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between text-sm">

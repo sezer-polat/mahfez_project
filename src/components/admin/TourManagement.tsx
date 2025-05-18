@@ -87,7 +87,7 @@ export function TourManagement() {
                   <div className="text-sm text-gray-500">{tour.location}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{tour.price} TL</div>
+                  <div className="text-sm text-gray-500">{tour.price} $</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">{tour.type}</div>

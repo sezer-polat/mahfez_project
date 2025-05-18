@@ -60,9 +60,9 @@ export function TourFilters() {
             />
           </div>
           <div className="flex justify-between text-sm text-gray-600">
-            <span>₺0</span>
-            <span>₺{priceRange.toLocaleString()}</span>
-            <span>₺10000</span>
+            <span>$0</span>
+            <span>${priceRange.toLocaleString('en-US')}</span>
+            <span>$10000</span>
           </div>
         </div>
 

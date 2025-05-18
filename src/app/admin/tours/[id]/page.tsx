@@ -271,7 +271,7 @@ export default function EditTourPage({ params }: { params: { id: string } }) {
 
                 <div>
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                    Fiyat (₺)
+                    Fiyat ($)
                   </label>
                   <input
                     type="number"

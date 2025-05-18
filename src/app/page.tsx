@@ -152,7 +152,7 @@ export default function Home() {
                     <ul className="space-y-2 text-gray-600">
                       <li>✓ {tour.duration} Gün</li>
                       <li>✓ {tour.category?.name || 'Kategori Yok'}</li>
-                      <li>✓ ₺{tour.price?.toLocaleString('tr-TR') || tour.price}</li>
+                      <li>✓ ${tour.price?.toLocaleString('en-US') || tour.price}</li>
                     </ul>
                   </div>
                   <div className="card-footer">
