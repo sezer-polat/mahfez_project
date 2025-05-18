@@ -94,6 +94,7 @@ export default function TourDetailPage() {
           </div>
           <span>{tour.category.name}</span>
         </div>
+        <p className="mt-4 text-gray-700 text-lg">{tour.description}</p>
       </div>
 
       {/* Fotoğraf Galerisi */}
@@ -177,12 +178,11 @@ export default function TourDetailPage() {
                 <div className="relative aspect-video w-full rounded-lg overflow-hidden mb-2" style={{ minHeight: 180 }}>
                   <Image
                     src={tour.images[currentDay - 1].url}
-                    alt={tour.images[currentDay - 1].title}
+                    alt={tour.title}
                     fill
                     className="object-cover"
                   />
                 </div>
-                <div className="text-sm text-gray-700 text-center">{tour.images[currentDay - 1].title}</div>
               </div>
             )}
 
