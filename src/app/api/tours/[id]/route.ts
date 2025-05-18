@@ -40,6 +40,8 @@ export async function GET(
           select: { id: true, url: true, title: true, order: true },
           orderBy: { order: 'asc' },
         },
+        capacity: true,
+        available: true
       },
     });
 
