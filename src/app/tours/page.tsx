@@ -45,7 +45,7 @@ function ToursContent() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('category') || '');
-  const [priceRange, setPriceRange] = useState<number>(Number(searchParams.get('price')) || 1000000);
+  const [priceRange, setPriceRange] = useState<number>(Number(searchParams.get('price')) || 10000);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
@@ -60,7 +60,7 @@ function ToursContent() {
   const updateUrlParams = () => {
     const params = new URLSearchParams();
     if (selectedCategory) params.set('category', selectedCategory);
-    if (priceRange !== 1000000) params.set('price', priceRange.toString());
+    if (priceRange !== 10000) params.set('price', priceRange.toString());
     if (currentPage > 1) params.set('page', currentPage.toString());
     if (viewMode !== 'grid') params.set('view', viewMode);
     if (sortBy !== 'date') params.set('sort', sortBy);
@@ -251,7 +251,7 @@ function ToursContent() {
             onClick={() => {
               setShowAllTours(!showAllTours);
               setSelectedCategory('');
-              setPriceRange(1000000);
+              setPriceRange(10000);
               handleFilterChange();
             }}
             className={`px-4 py-2 rounded-full whitespace-nowrap shadow-sm transition-colors ${
@@ -291,7 +291,7 @@ function ToursContent() {
               <button 
                 onClick={() => {
                   setSelectedCategory('');
-                  setPriceRange(1000000);
+                  setPriceRange(10000);
                   handleFilterChange();
                 }}
                 className="text-primary text-sm hover:underline"
@@ -307,7 +307,7 @@ function ToursContent() {
                 <input
                   type="range"
                   min="0"
-                  max="1000000"
+                  max="10000"
                   value={priceRange}
                   onChange={(e) => setPriceRange(Number(e.target.value))}
                   className="w-full"
@@ -316,7 +316,7 @@ function ToursContent() {
               <div className="flex justify-between text-sm text-gray-600">
                 <span>$0</span>
                 <span>${priceRange.toLocaleString('en-US')}</span>
-                <span>$1,000,000</span>
+                <span>$10,000</span>
               </div>
             </div>
 
