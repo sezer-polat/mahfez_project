@@ -93,7 +93,7 @@ export default function Home() {
         {/* Slider Content */}
         <div className="relative z-40 text-center text-white px-4">
           <h1 className="text-5xl font-bold mb-4">Mahfez Tur</h1>
-          <p className="text-xl mb-8">Hac ve Umre Turlarında Güvenilir Adresiniz</p>
+          <p className="text-xl mb-8">Seyahat Edin Sıhhat Bulun</p>
           <Link href="/tours" className="btn btn-primary text-lg px-8 py-3">
             Turları Keşfet
           </Link>

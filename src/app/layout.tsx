@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Mahfez Tur - Hac ve Umre Turları",
-  description: "Hac ve Umre turlarında güvenilir adresiniz",
+  description: "Seyahat Edin Sıhhat Bulun",
 };
 
 export default function RootLayout({

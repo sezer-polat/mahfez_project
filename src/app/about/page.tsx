@@ -21,7 +21,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div className="text-center text-white">
               <h2 className="text-4xl font-bold mb-4">20 Yıllık Deneyim</h2>
-              <p className="text-xl">Hac ve Umre Turlarında Güvenilir Adresiniz</p>
+              <p className="text-xl">Seyahat Edin Sıhhat Bulun</p>
             </div>
           </div>
         </div>
