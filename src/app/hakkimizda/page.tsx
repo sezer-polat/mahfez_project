@@ -5,37 +5,31 @@ import Link from 'next/link'
 
 export default function AboutPage() {
   const stats = [
-    { label: 'Mutlu Müşteri', value: '10,000+' },
-    { label: 'Tamamlanan Tur', value: '500+' },
-    { label: 'Yıllık Deneyim', value: '15+' },
-    { label: 'Profesyonel Rehber', value: '50+' },
+    { label: 'Mutlu Müşteri', value: '3,000+' },
+    { label: 'Tamamlanan Tur', value: '150+' },
+    { label: 'Yıllık Deneyim', value: '3+' },
+    { label: 'Profesyonel Rehber', value: '15+' },
   ]
 
   const team = [
     {
-      name: 'Ahmet Yılmaz',
-      role: 'Kurucu & CEO',
+      name: 'Devran Tulgar',
+      role: 'Müdür',
       image: '/team/ceo.jpg',
-      bio: '15 yıllık seyahat sektörü deneyimi ile Yeşil Yolculuk\'u kurdu.',
+      bio: 'Şirketimizin yönetiminden sorumlu, deneyimli liderimiz.',
     },
     {
-      name: 'Ayşe Demir',
-      role: 'Operasyon Müdürü',
+      name: 'Emre Örnek',
+      role: 'Tur Görevlisi',
       image: '/team/operations.jpg',
-      bio: 'Tur operasyonları ve müşteri deneyimi konusunda uzman.',
+      bio: 'Turlarımızın başarılı bir şekilde gerçekleşmesi için çalışan profesyonel ekibimiz.',
     },
     {
-      name: 'Mehmet Kaya',
-      role: 'Satış Müdürü',
+      name: 'Adem Tulgar',
+      role: 'Sosyal Medya Sorumlusu',
       image: '/team/sales.jpg',
-      bio: '10 yıllık satış ve pazarlama deneyimi.',
-    },
-    {
-      name: 'Zeynep Şahin',
-      role: 'Müşteri İlişkileri',
-      image: '/team/customer.jpg',
-      bio: 'Müşteri memnuniyeti odaklı yaklaşımı ile öne çıkıyor.',
-    },
+      bio: 'Sosyal medya hesaplarımızın yönetimi ve dijital iletişim stratejilerimizden sorumlu.',
+    }
   ]
 
   return (
@@ -55,8 +49,8 @@ export default function AboutPage() {
             Hakkımızda
           </h1>
           <p className="mt-6 text-xl text-white max-w-3xl">
-            2010 yılından bu yana Türkiye'nin en iyi tur ve seyahat deneyimlerini sunuyoruz.
-            Müşteri memnuniyeti ve kaliteli hizmet anlayışımızla sektörde öncü konumdayız.
+            2022 yılında kurulan Mahfez Tur, kısa sürede sektörde güvenilir ve kaliteli hizmet anlayışıyla öne çıkmayı başardı. 
+            Müşteri memnuniyeti odaklı yaklaşımımız ve profesyonel ekibimizle, unutulmaz seyahat deneyimleri sunmaya devam ediyoruz.
           </p>
         </div>
       </div>
