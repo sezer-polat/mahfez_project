@@ -131,6 +131,15 @@
   .reservations-page {
     @apply w-full max-w-[2000px] -ml-[225px];
   }
+  @media (max-width: 640px) {
+    .reservations-page {
+      max-width: 100% !important;
+      margin-left: 0 !important;
+    }
+    .reservations-page h1 {
+      margin-left: 0 !important;
+    }
+  }
   .reservations-page h1 {
     @apply ml-[-225px];
   }

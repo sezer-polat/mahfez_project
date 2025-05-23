@@ -186,9 +186,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <AuthProvider>
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col max-w-screen-xl mx-auto px-2 sm:px-4">
               <Navbar />
-              <main className="flex-grow pt-16">
+              <main className="flex-grow pt-16 w-full px-0 sm:px-4">
                 {children}
               </main>
               <Footer />
