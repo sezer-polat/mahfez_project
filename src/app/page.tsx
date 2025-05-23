@@ -72,7 +72,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Slider */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden w-full">
         {/* Slider Images */}
         {sliderImages.map((src, i) => (
           <div
@@ -92,9 +92,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/50 z-30" />
         {/* Slider Content */}
         <div className="relative z-40 text-center text-white px-4">
-          <h1 className="text-5xl font-bold mb-4">Mahfez Tur</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">Mahfez Tur</h1>
           <p className="text-xl mb-8">Seyahat Edin Sıhhat Bulun</p>
-          <Link href="/tours" className="btn btn-primary text-lg px-8 py-3">
+          <Link href="/tours" className="btn btn-primary text-base md:text-lg px-6 md:px-8 py-2 md:py-3">
             Turları Keşfet
           </Link>
         </div>
@@ -115,10 +115,10 @@ export default function Home() {
       </section>
 
       {/* Öne Çıkan Turlar */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold">Öne Çıkan Turlarımız</h2>
+      <section className="py-10 md:py-16 bg-gray-50">
+        <div className="w-full max-w-screen-xl mx-auto px-2 sm:px-4">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 md:mb-12 gap-4">
+            <h2 className="text-2xl md:text-3xl font-bold">Öne Çıkan Turlarımız</h2>
             <Link href="/tours" className="btn btn-outline-primary">
               Tüm Turlar
             </Link>
@@ -132,7 +132,7 @@ export default function Home() {
               {error}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredTours.map((tour) => (
                 <div key={tour.id} className="card tour-card">
                   <div className="relative h-48">
