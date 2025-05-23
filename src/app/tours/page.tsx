@@ -243,7 +243,7 @@ function ToursContent() {
   }
 
   return (
-    <div className="min-h-screen py-8 md:py-12 bg-gray-50">
+    <div className="min-h-screen py-8 md:py-12 bg-background pt-20">
       <div className="w-full max-w-screen-xl mx-auto px-2 sm:px-4">
         {/* Category Chips */}
         <div className="mb-8 overflow-x-auto pb-2 hide-scrollbar">
