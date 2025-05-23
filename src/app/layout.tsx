@@ -183,16 +183,16 @@ export default function RootLayout({
           }
         `}} />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className + " bg-background"}>
         <SessionProvider>
           <AuthProvider>
-            <div className="min-h-screen flex flex-col max-w-screen-xl mx-auto px-2 sm:px-4 bg-background">
-              <Navbar />
-              <main className="flex-grow pt-16 w-full px-0 sm:px-4 bg-background">
+            <Navbar />
+            <main className="flex-grow w-full min-h-[calc(100vh-64px)]">
+              <div className="w-full max-w-screen-xl mx-auto px-2 sm:px-4">
                 {children}
-              </main>
-              <Footer />
-            </div>
+              </div>
+            </main>
+            <Footer />
             <Toaster />
           </AuthProvider>
         </SessionProvider>
