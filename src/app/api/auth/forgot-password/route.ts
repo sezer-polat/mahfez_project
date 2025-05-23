@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     });
 
     // E-posta gönder
-    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/sifre-yenile?token=${token}&email=${encodeURIComponent(email)}`;
+    const resetUrl = `https://mahfeztur.com/sifre-yenile?token=${token}&email=${encodeURIComponent(email)}`;
     await sendMail({
       to: email,
       subject: 'Şifre Sıfırlama Talebi',
