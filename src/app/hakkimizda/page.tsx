@@ -7,13 +7,13 @@ export default function AboutPage() {
   const stats = [
     { label: 'Mutlu Müşteri', value: '3,000+' },
     { label: 'Tamamlanan Tur', value: '150+' },
-    { label: 'Yıllık Deneyim', value: '3+' },
+    { label: 'Yılların Tecrübesi', value: '3+' },
     { label: 'Profesyonel Rehber', value: '15+' },
   ]
 
   const team = [
     {
-      name: 'Devran Tulgar',
+      name: 'Şükran Turhan',
       role: 'Müdür',
       image: '/team/ceo.jpg',
       bio: 'Şirketimizin yönetiminden sorumlu, deneyimli liderimiz.',
