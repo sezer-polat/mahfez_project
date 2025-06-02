@@ -7,7 +7,7 @@ export default function AboutPage() {
   const stats = [
     { label: 'Mutlu Müşteri', value: '3,000+' },
     { label: 'Tamamlanan Tur', value: '150+' },
-    { label: 'Yılların Tecrübesi', value: '' },
+    { label: 'Yılların Tecrübesi', value: '+' },
     { label: 'Profesyonel Rehber', value: '15+' },
   ]
 
